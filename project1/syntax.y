@@ -1,12 +1,18 @@
+%locations
 %{
-    #include"lex.yy.c"
+    #include "ASTNode.h"
+    #include "lex.yy.c"
     void yyerror(const char*);
 %}
-%token INT
-%token FLOAT
-%token CHAR
-%token ID
-%token TYPE
+%union{ 
+    struct ASTNode *node;
+}
+
+%token <int_value> INT
+%token <float_value> FLOAT
+%token <string_value> CHAR
+%token <string_value> ID
+%token <string_value> TYPE
 %token STRUCT
 %token IF ELSE
 %token WHILE
@@ -18,7 +24,8 @@
 %token LP RP LB RB LC RC
 %%
 
-Program: ExtDefList;
+Program: ExtDefList
+    ; 
 ExtDefList: ExtDef ExtDefList
     | %empty
     ;
@@ -46,9 +53,11 @@ FunDec: ID LP VarList RP
 VarList: ParamDec COMMA VarList
     | ParamDec
     ;
-ParamDec: Specifier VarDec;
+ParamDec: Specifier VarDec
+    ;
 
-CompSt: LC DefList StmtList RC;
+CompSt: LC DefList StmtList RC
+    ;
 StmtList: Stmt StmtList
     | %empty
     ;
@@ -63,7 +72,8 @@ Stmt: Exp SEMI
 DefList: Def DefList
     | %empty
     ;
-Def: Specifier DecList SEMI;
+Def: Specifier DecList SEMI
+    ;
 DecList: Dec
     | Dec COMMA DecList
     ;

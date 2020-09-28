@@ -1,5 +1,16 @@
 %{
-    #include"syntax.tab.h"
+    #include "syntax.tab.h"
+    #include "ASTNode.h"
+
+    /* library inclusions */ 
+    int yycolno = 1;
+    #define YY_USER_ACTION \
+        yylloc.first_line = yylineno; \
+        yylloc.first_column = yycolno; \
+        yylloc.last_line = yylineno; \
+        yylloc.last_column = yycolno + yyleng; \
+        yycolno += yyleng;
+
 %}
 
 ID_START_0 \xC2\xAA|\xC2\xB5|\xC2\xBA|\xC3[\x80-\x96]|\xC3[\x98-\xB6]|\xC3[\xB8-\xBF]|\xC4[\x80-\xBF]|\xC5[\x80-\xBF]|\xC6[\x80-\xBF]|\xC7[\x80-\xBF]|\xC8[\x80-\xBF]|\xC9[\x80-\x81]|\xC9[\x90-\xBF]|\xCA[\x80-\xBF]|\xCB[\x80-\x81]|\xCB[\x86-\x91]|\xCB[\xA0-\xA4]|\xCB\xAE|\xCD\xBA|\xCE\x86|\xCE[\x88-\x8A]|\xCE\x8C|\xCE[\x8E-\xA1]|\xCE[\xA3-\xBF]|\xCF[\x80-\x8E]|\xCF[\x90-\xB5]|\xCF[\xB7-\xBF]|\xD0[\x80-\xBF]|\xD1[\x80-\xBF]|\xD2[\x80-\x81]|\xD2[\x8A-\xBF]|\xD3[\x80-\x8E]|\xD3[\x90-\xB9]|\xD4[\x80-\x8F]|\xD4[\xB1-\xBF]|\xD5[\x80-\x96]|\xD5\x99|\xD5[\xA1-\xBF]|\xD6[\x80-\x87]|\xD7[\x90-\xAA]|\xD7[\xB0-\xB2]|\xD8[\xA1-\xBA]|\xD9[\x80-\x8A]|\xD9[\xAE-\xAF]|\xD9[\xB1-\xBF]|\xDA[\x80-\xBF]|\xDB[\x80-\x93]|\xDB\x95|\xDB[\xA5-\xA6]|\xDB[\xAE-\xAF]|\xDB[\xBA-\xBC]|\xDB\xBF|\xDC\x90|\xDC[\x92-\xAF]|\xDD[\x8D-\xAD]|\xDE[\x80-\xA5]|\xDE\xB1|\xE0\xA4[\x84-\xB9]|\xE0\xA4\xBD|\xE0\xA5\x90|\xE0\xA5[\x98-\xA1]|\xE0\xA5\xBD|\xE0\xA6[\x85-\x8C]|\xE0\xA6[\x8F-\x90]|\xE0\xA6[\x93-\xA8]
@@ -55,18 +66,55 @@ ID_START _|[A-Z]|[a-z]|{ID_START_0}|{ID_START_1}|{ID_START_2}|{ID_START_3}|{ID_S
 ID_CONTINUE {ID_START}|[0-9]|{ID_CONTINUE_0}|{ID_CONTINUE_1}|{ID_CONTINUE_2}|{ID_CONTINUE_3}
  
 %%
-[+-]?[0-9]+|[+-]?0x[0-9A-Fa-f]+ { return INT; }
-[+-]?([0-9]*\.?[0-9]+|[0-9]+\.) { return FLOAT; }
-\'([\x20-\x7E]|\\x[0-9A-Fa-f]{1,2})\' { return CHAR; }
+[0-9]|[1-9][0-9]+ { 
+    yylval.node = make_int_node("INT", (int)strtol(yytext, NULL, 10));
+    return INT;
+}
+0[xX]([0-9A-Fa-f]|[1-9A-Fa-f][0-9A-Fa-f]+) {
+    yylval.node = make_int_node("INT", (int)strtol(yytext, NULL, 0));
+    return INT;
+}
 
-int|float|char { return TYPE; }
+[-]?[0-9]+\.[0-9]+ { 
+    yylval.node = make_float_node("FLOAT", strtof(yytext, NULL));
+    return FLOAT; 
+}
+
+\'[\x20-\x7E]\' { 
+    char str[2];
+    str[0] = yytext[1];
+    str[1] = '\0';
+    yylval.node = make_string_node("CHAR", str);
+    return CHAR;
+}
+
+\'\\x[0-9A-Fa-f]{1,2}\' {
+    char str[5] = "0x";
+    str[2] = yytext[3];
+    if (yytext[4] != '\'') str[3] = yytext[4];
+
+    char c = (char)strtol(str, NULL, 0);
+    str[0] = c;
+    str[1] = '\0';
+    yylval.node = make_string_node("CHAR", str);
+    return CHAR;
+}
+
+int|float|char { 
+    yylval.node = make_string_node("TYPE", yytext);
+    return TYPE;
+}
+
 struct { return STRUCT; }
 if { return IF; }
 else { return ELSE; }
 while { return WHILE; }
 return { return RETURN; }
 
-{ID_START}{ID_CONTINUE}* { return ID; }
+{ID_START}{ID_CONTINUE}* { 
+    yylval.node = make_string_node("ID", yytext);
+    return ID;
+}
 
 "." { return DOT; }
 ";" { return SEMI; }
@@ -95,5 +143,9 @@ return { return RETURN; }
 "]" { return RB; }
 "{" { return LC; }
 "}" { return RC; }
-[ \n\r\t] {}
+
+[ \r\t] {}
+\n {
+    yycolno = 1;
+}
 . { fprintf(stderr, "unknown symbol: %s\n", yytext); }
