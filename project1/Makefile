@@ -6,7 +6,7 @@ BISON=bison
 .lex: lex.l
 	$(FLEX) lex.l
 .syntax: syntax.y
-	$(BISON) -t -d syntax.y
+	$(BISON) -v -t -d syntax.y
 splc: .lex .syntax
 	mkdir -p bin && $(CC) syntax.tab.c ASTNode.c -lfl -ly -o bin/splc
 clean:

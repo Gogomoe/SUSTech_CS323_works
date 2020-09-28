@@ -22,6 +22,16 @@
 %token LT LE GT GE NE EQ
 %token PLUS MINUS MUL DIV AND OR NOT
 %token LP RP LB RB LC RC
+
+%right ASSIGN
+%left OR
+%left AND
+%left GT GE LT LE EQ NE
+%left PLUS MINUS
+%left MUL DIV
+%right NOT
+%left LC RC LB RB DOT
+
 %%
 
 Program: ExtDefList
