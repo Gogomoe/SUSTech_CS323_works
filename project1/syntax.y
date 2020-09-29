@@ -8,11 +8,11 @@
     struct ASTNode *node;
 }
 
-%token <int_value> INT
-%token <float_value> FLOAT
-%token <string_value> CHAR
-%token <string_value> ID
-%token <string_value> TYPE
+%token INT
+%token FLOAT
+%token CHAR
+%token ID
+%token TYPE
 %token STRUCT
 %token IF ELSE
 %token WHILE
@@ -31,6 +31,9 @@
 %left MUL DIV
 %right NOT
 %left LC RC LB RB DOT
+
+%nonassoc LOWER_ELSE
+%nonassoc ELSE
 
 %%
 
@@ -74,7 +77,7 @@ StmtList: Stmt StmtList
 Stmt: Exp SEMI
     | CompSt
     | RETURN Exp SEMI
-    | IF LP Exp RP Stmt
+    | IF LP Exp RP Stmt %prec LOWER_ELSE
     | IF LP Exp RP Stmt ELSE Stmt
     | WHILE LP Exp RP Stmt
     ;
