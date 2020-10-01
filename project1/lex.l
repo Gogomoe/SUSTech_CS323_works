@@ -105,44 +105,44 @@ int|float|char {
     return TYPE;
 }
 
-struct { return STRUCT; }
-if { return IF; }
-else { return ELSE; }
-while { return WHILE; }
-return { return RETURN; }
+struct { yylval.node = make_empty_node("STRUCT"); return STRUCT; }
+if { yylval.node = make_empty_node("IF"); return IF; }
+else { yylval.node = make_empty_node("ELSE"); return ELSE; }
+while { yylval.node = make_empty_node("WHILE"); return WHILE; }
+return { yylval.node = make_empty_node("RETURN"); return RETURN; }
 
 {ID_START}{ID_CONTINUE}* { 
     yylval.node = make_string_node("ID", yytext);
     return ID;
 }
 
-"." { return DOT; }
-";" { return SEMI; }
-"," { return COMMA; }
+"." { yylval.node = make_empty_node("DOT"); return DOT; }
+";" { yylval.node = make_empty_node("SEMI"); return SEMI; }
+"," { yylval.node = make_empty_node("COMMA"); return COMMA; }
 
-"==" { return EQ; }
-"!=" { return NE; }
-"=" { return ASSIGN; }
+"==" { yylval.node = make_empty_node("EQ"); return EQ; }
+"!=" { yylval.node = make_empty_node("NE"); return NE; }
+"=" { yylval.node = make_empty_node("ASSIGN"); return ASSIGN; }
 
-"<=" { return LE; }
-"<" { return LT; }
-">=" { return GE; }
-">" { return GT; }
+"<=" { yylval.node = make_empty_node("LE"); return LE; }
+"<" { yylval.node = make_empty_node("LT"); return LT; }
+">=" { yylval.node = make_empty_node("GE"); return GE; }
+">" { yylval.node = make_empty_node("GT"); return GT; }
 
-"+" { return PLUS; }
-"-" { return MINUS; }
-"*" { return MUL; }
-"/" { return DIV; }
-"&&" { return AND; }
-"||" { return OR; }
-"!" { return NOT; }
+"+" { yylval.node = make_empty_node("PLUS"); return PLUS; }
+"-" { yylval.node = make_empty_node("MINUS"); return MINUS; }
+"*" { yylval.node = make_empty_node("MUL"); return MUL; }
+"/" { yylval.node = make_empty_node("DIV"); return DIV; }
+"&&" { yylval.node = make_empty_node("AND"); return AND; }
+"||" { yylval.node = make_empty_node("OR"); return OR; }
+"!" { yylval.node = make_empty_node("NOT"); return NOT; }
 
-"(" { return LP; }
-")" { return RP; }
-"[" { return LB; }
-"]" { return RB; }
-"{" { return LC; }
-"}" { return RC; }
+"(" { yylval.node = make_empty_node("LP"); return LP; }
+")" { yylval.node = make_empty_node("RP"); return RP; }
+"[" { yylval.node = make_empty_node("LB"); return LB; }
+"]" { yylval.node = make_empty_node("RB"); return RB; }
+"{" { yylval.node = make_empty_node("LC"); return LC; }
+"}" { yylval.node = make_empty_node("RC"); return RC; }
 
 [ \r\t] {}
 \n {
