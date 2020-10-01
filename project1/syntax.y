@@ -5,31 +5,22 @@
     void yyerror(const char*);
     struct ASTNode *program;
 %}
-%union{ 
-    struct ASTNode *node;
-}
+%define api.value.type {struct ASTNode *}
 
-%token <node> INT
-%token <node> FLOAT
-%token <node> CHAR
-%token <node> ID
-%token <node> TYPE
-%token <node> STRUCT
-%token <node> IF ELSE
-%token <node> WHILE
-%token <node> RETURN
-%token <node> DOT SEMI COMMA
-%token <node> ASSIGN
-%token <node> LT LE GT GE NE EQ
-%token <node> PLUS MINUS MUL DIV AND OR NOT
-%token <node> LP RP LB RB LC RC
-
-%type <node> Program ExtDefList ExtDef ExtDecList
-%type <node> Specifier StructSpecifier
-%type <node> VarDec FunDec VarList ParamDec
-%type <node> CompSt StmtList Stmt
-%type <node> DefList Def DecList Dec
-%type <node> Exp Args
+%token INT
+%token FLOAT
+%token CHAR
+%token ID
+%token TYPE
+%token STRUCT
+%token IF ELSE
+%token WHILE
+%token RETURN
+%token DOT SEMI COMMA
+%token ASSIGN
+%token LT LE GT GE NE EQ
+%token PLUS MINUS MUL DIV AND OR NOT
+%token LP RP LB RB LC RC
 
 %right ASSIGN
 %left OR

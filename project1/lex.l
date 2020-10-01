@@ -67,16 +67,16 @@ ID_CONTINUE {ID_START}|[0-9]|{ID_CONTINUE_0}|{ID_CONTINUE_1}|{ID_CONTINUE_2}|{ID
  
 %%
 [0-9]|[1-9][0-9]+ { 
-    yylval.node = make_int_node("INT", (int)strtol(yytext, NULL, 10));
+    yylval = make_int_node("INT", (int)strtol(yytext, NULL, 10));
     return INT;
 }
 0[xX]([0-9A-Fa-f]|[1-9A-Fa-f][0-9A-Fa-f]+) {
-    yylval.node = make_int_node("INT", (int)strtol(yytext, NULL, 0));
+    yylval = make_int_node("INT", (int)strtol(yytext, NULL, 0));
     return INT;
 }
 
 [-]?[0-9]+\.[0-9]+ { 
-    yylval.node = make_float_node("FLOAT", strtof(yytext, NULL));
+    yylval = make_float_node("FLOAT", strtof(yytext, NULL));
     return FLOAT; 
 }
 
@@ -84,7 +84,7 @@ ID_CONTINUE {ID_START}|[0-9]|{ID_CONTINUE_0}|{ID_CONTINUE_1}|{ID_CONTINUE_2}|{ID
     char str[2];
     str[0] = yytext[1];
     str[1] = '\0';
-    yylval.node = make_string_node("CHAR", str);
+    yylval = make_string_node("CHAR", str);
     return CHAR;
 }
 
@@ -96,53 +96,53 @@ ID_CONTINUE {ID_START}|[0-9]|{ID_CONTINUE_0}|{ID_CONTINUE_1}|{ID_CONTINUE_2}|{ID
     char c = (char)strtol(str, NULL, 0);
     str[0] = c;
     str[1] = '\0';
-    yylval.node = make_string_node("CHAR", str);
+    yylval = make_string_node("CHAR", str);
     return CHAR;
 }
 
 int|float|char { 
-    yylval.node = make_string_node("TYPE", yytext);
+    yylval = make_string_node("TYPE", yytext);
     return TYPE;
 }
 
-struct { yylval.node = make_empty_node("STRUCT"); return STRUCT; }
-if { yylval.node = make_empty_node("IF"); return IF; }
-else { yylval.node = make_empty_node("ELSE"); return ELSE; }
-while { yylval.node = make_empty_node("WHILE"); return WHILE; }
-return { yylval.node = make_empty_node("RETURN"); return RETURN; }
+struct  { yylval = make_empty_node("STRUCT"); return STRUCT; }
+if      { yylval = make_empty_node("IF"); return IF; }
+else    { yylval = make_empty_node("ELSE"); return ELSE; }
+while   { yylval = make_empty_node("WHILE"); return WHILE; }
+return  { yylval = make_empty_node("RETURN"); return RETURN; }
 
 {ID_START}{ID_CONTINUE}* { 
-    yylval.node = make_string_node("ID", yytext);
+    yylval = make_string_node("ID", yytext);
     return ID;
 }
 
-"." { yylval.node = make_empty_node("DOT"); return DOT; }
-";" { yylval.node = make_empty_node("SEMI"); return SEMI; }
-"," { yylval.node = make_empty_node("COMMA"); return COMMA; }
+"." { yylval = make_empty_node("DOT"); return DOT; }
+";" { yylval = make_empty_node("SEMI"); return SEMI; }
+"," { yylval = make_empty_node("COMMA"); return COMMA; }
 
-"==" { yylval.node = make_empty_node("EQ"); return EQ; }
-"!=" { yylval.node = make_empty_node("NE"); return NE; }
-"=" { yylval.node = make_empty_node("ASSIGN"); return ASSIGN; }
+"==" { yylval = make_empty_node("EQ"); return EQ; }
+"!=" { yylval = make_empty_node("NE"); return NE; }
+"=" { yylval = make_empty_node("ASSIGN"); return ASSIGN; }
 
-"<=" { yylval.node = make_empty_node("LE"); return LE; }
-"<" { yylval.node = make_empty_node("LT"); return LT; }
-">=" { yylval.node = make_empty_node("GE"); return GE; }
-">" { yylval.node = make_empty_node("GT"); return GT; }
+"<=" { yylval = make_empty_node("LE"); return LE; }
+"<" { yylval = make_empty_node("LT"); return LT; }
+">=" { yylval = make_empty_node("GE"); return GE; }
+">" { yylval = make_empty_node("GT"); return GT; }
 
-"+" { yylval.node = make_empty_node("PLUS"); return PLUS; }
-"-" { yylval.node = make_empty_node("MINUS"); return MINUS; }
-"*" { yylval.node = make_empty_node("MUL"); return MUL; }
-"/" { yylval.node = make_empty_node("DIV"); return DIV; }
-"&&" { yylval.node = make_empty_node("AND"); return AND; }
-"||" { yylval.node = make_empty_node("OR"); return OR; }
-"!" { yylval.node = make_empty_node("NOT"); return NOT; }
+"+" { yylval = make_empty_node("PLUS"); return PLUS; }
+"-" { yylval = make_empty_node("MINUS"); return MINUS; }
+"*" { yylval = make_empty_node("MUL"); return MUL; }
+"/" { yylval = make_empty_node("DIV"); return DIV; }
+"&&" { yylval = make_empty_node("AND"); return AND; }
+"||" { yylval = make_empty_node("OR"); return OR; }
+"!" { yylval = make_empty_node("NOT"); return NOT; }
 
-"(" { yylval.node = make_empty_node("LP"); return LP; }
-")" { yylval.node = make_empty_node("RP"); return RP; }
-"[" { yylval.node = make_empty_node("LB"); return LB; }
-"]" { yylval.node = make_empty_node("RB"); return RB; }
-"{" { yylval.node = make_empty_node("LC"); return LC; }
-"}" { yylval.node = make_empty_node("RC"); return RC; }
+"(" { yylval = make_empty_node("LP"); return LP; }
+")" { yylval = make_empty_node("RP"); return RP; }
+"[" { yylval = make_empty_node("LB"); return LB; }
+"]" { yylval = make_empty_node("RB"); return RB; }
+"{" { yylval = make_empty_node("LC"); return LC; }
+"}" { yylval = make_empty_node("RC"); return RC; }
 
 [ \r\t] {}
 \n {
