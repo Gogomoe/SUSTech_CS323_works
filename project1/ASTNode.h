@@ -1,6 +1,8 @@
 #ifndef AST_H
 #define AST_H
 
+#include "YYLTYPE.h"
+
 enum ASTType {
     EMPTY_LEAF,
     INT_LEAF,
@@ -13,6 +15,7 @@ struct ASTNode {
     enum ASTType type;
     char *name;
     struct ASTNode *next;
+    struct YYLTYPE position;
     union {
         int int_value;
         float float_value;
@@ -21,31 +24,35 @@ struct ASTNode {
     };
 };
 
-struct ASTNode *make_empty_node(char *name);
+struct ASTNode *make_empty_node(char *name, struct YYLTYPE position);
 
-struct ASTNode *make_int_node(char *name, int value);
+struct ASTNode *make_int_node(char *name, struct YYLTYPE position, int value);
 
-struct ASTNode *make_float_node(char *name, float value);
+struct ASTNode *make_float_node(char *name, struct YYLTYPE position, float value);
 
-struct ASTNode *make_string_node(char *name, char *value);
+struct ASTNode *make_string_node(char *name, struct YYLTYPE position, char *value);
 
 struct ASTNode *make_internal_node0(
-        char *name
+        char *name,
+        struct YYLTYPE position
 );
 
 struct ASTNode *make_internal_node1(
         char *name,
+        struct YYLTYPE position,
         struct ASTNode *node1
 );
 
 struct ASTNode *make_internal_node2(
         char *name,
+        struct YYLTYPE position,
         struct ASTNode *node1,
         struct ASTNode *node2
 );
 
 struct ASTNode *make_internal_node3(
         char *name,
+        struct YYLTYPE position,
         struct ASTNode *node1,
         struct ASTNode *node2,
         struct ASTNode *node3
@@ -53,6 +60,7 @@ struct ASTNode *make_internal_node3(
 
 struct ASTNode *make_internal_node4(
         char *name,
+        struct YYLTYPE position,
         struct ASTNode *node1,
         struct ASTNode *node2,
         struct ASTNode *node3,
@@ -61,6 +69,7 @@ struct ASTNode *make_internal_node4(
 
 struct ASTNode *make_internal_node5(
         char *name,
+        struct YYLTYPE position,
         struct ASTNode *node1,
         struct ASTNode *node2,
         struct ASTNode *node3,
@@ -70,6 +79,7 @@ struct ASTNode *make_internal_node5(
 
 struct ASTNode *make_internal_node6(
         char *name,
+        struct YYLTYPE position,
         struct ASTNode *node1,
         struct ASTNode *node2,
         struct ASTNode *node3,
@@ -80,6 +90,7 @@ struct ASTNode *make_internal_node6(
 
 struct ASTNode *make_internal_node7(
         char *name,
+        struct YYLTYPE position,
         struct ASTNode *node1,
         struct ASTNode *node2,
         struct ASTNode *node3,

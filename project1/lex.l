@@ -2,15 +2,18 @@
     #include "syntax.tab.h"
     #include "ASTNode.h"
 
-    /* library inclusions */ 
-    int yycolno = 1;
     #define YY_USER_ACTION \
-        yylloc.first_line = yylineno; \
-        yylloc.first_column = yycolno; \
-        yylloc.last_line = yylineno; \
-        yylloc.last_column = yycolno + yyleng; \
-        yycolno += yyleng;
-
+        yylloc.first_line = yylloc.last_line; \
+        yylloc.first_column = yylloc.last_column; \
+        for (int i = 0; yytext[i] != '\0'; i++) { \
+            if(yytext[i] == '\n') { \
+                yylloc.last_line++; \
+                yylloc.last_column = 1; \
+            } \
+            else { \
+                yylloc.last_column++; \
+            } \
+        }
 %}
 
 ID_START_0 \xC2\xAA|\xC2\xB5|\xC2\xBA|\xC3[\x80-\x96]|\xC3[\x98-\xB6]|\xC3[\xB8-\xBF]|\xC4[\x80-\xBF]|\xC5[\x80-\xBF]|\xC6[\x80-\xBF]|\xC7[\x80-\xBF]|\xC8[\x80-\xBF]|\xC9[\x80-\x81]|\xC9[\x90-\xBF]|\xCA[\x80-\xBF]|\xCB[\x80-\x81]|\xCB[\x86-\x91]|\xCB[\xA0-\xA4]|\xCB\xAE|\xCD\xBA|\xCE\x86|\xCE[\x88-\x8A]|\xCE\x8C|\xCE[\x8E-\xA1]|\xCE[\xA3-\xBF]|\xCF[\x80-\x8E]|\xCF[\x90-\xB5]|\xCF[\xB7-\xBF]|\xD0[\x80-\xBF]|\xD1[\x80-\xBF]|\xD2[\x80-\x81]|\xD2[\x8A-\xBF]|\xD3[\x80-\x8E]|\xD3[\x90-\xB9]|\xD4[\x80-\x8F]|\xD4[\xB1-\xBF]|\xD5[\x80-\x96]|\xD5\x99|\xD5[\xA1-\xBF]|\xD6[\x80-\x87]|\xD7[\x90-\xAA]|\xD7[\xB0-\xB2]|\xD8[\xA1-\xBA]|\xD9[\x80-\x8A]|\xD9[\xAE-\xAF]|\xD9[\xB1-\xBF]|\xDA[\x80-\xBF]|\xDB[\x80-\x93]|\xDB\x95|\xDB[\xA5-\xA6]|\xDB[\xAE-\xAF]|\xDB[\xBA-\xBC]|\xDB\xBF|\xDC\x90|\xDC[\x92-\xAF]|\xDD[\x8D-\xAD]|\xDE[\x80-\xA5]|\xDE\xB1|\xE0\xA4[\x84-\xB9]|\xE0\xA4\xBD|\xE0\xA5\x90|\xE0\xA5[\x98-\xA1]|\xE0\xA5\xBD|\xE0\xA6[\x85-\x8C]|\xE0\xA6[\x8F-\x90]|\xE0\xA6[\x93-\xA8]
@@ -67,16 +70,16 @@ ID_CONTINUE {ID_START}|[0-9]|{ID_CONTINUE_0}|{ID_CONTINUE_1}|{ID_CONTINUE_2}|{ID
  
 %%
 [0-9]|[1-9][0-9]+ { 
-    yylval = make_int_node("INT", (int)strtol(yytext, NULL, 10));
+    yylval = make_int_node("INT", yylloc, (int)strtol(yytext, NULL, 10));
     return INT;
 }
 0[xX]([0-9A-Fa-f]|[1-9A-Fa-f][0-9A-Fa-f]+) {
-    yylval = make_int_node("INT", (int)strtol(yytext, NULL, 0));
+    yylval = make_int_node("INT", yylloc, (int)strtol(yytext, NULL, 0));
     return INT;
 }
 
 [-]?[0-9]+\.[0-9]+ { 
-    yylval = make_float_node("FLOAT", strtof(yytext, NULL));
+    yylval = make_float_node("FLOAT", yylloc, strtof(yytext, NULL));
     return FLOAT; 
 }
 
@@ -84,7 +87,7 @@ ID_CONTINUE {ID_START}|[0-9]|{ID_CONTINUE_0}|{ID_CONTINUE_1}|{ID_CONTINUE_2}|{ID
     char str[2];
     str[0] = yytext[1];
     str[1] = '\0';
-    yylval = make_string_node("CHAR", str);
+    yylval = make_string_node("CHAR", yylloc, str);
     return CHAR;
 }
 
@@ -96,56 +99,54 @@ ID_CONTINUE {ID_START}|[0-9]|{ID_CONTINUE_0}|{ID_CONTINUE_1}|{ID_CONTINUE_2}|{ID
     char c = (char)strtol(str, NULL, 0);
     str[0] = c;
     str[1] = '\0';
-    yylval = make_string_node("CHAR", str);
+    yylval = make_string_node("CHAR", yylloc, str);
     return CHAR;
 }
 
 int|float|char { 
-    yylval = make_string_node("TYPE", yytext);
+    yylval = make_string_node("TYPE", yylloc, yytext);
     return TYPE;
 }
 
-struct  { yylval = make_empty_node("STRUCT"); return STRUCT; }
-if      { yylval = make_empty_node("IF"); return IF; }
-else    { yylval = make_empty_node("ELSE"); return ELSE; }
-while   { yylval = make_empty_node("WHILE"); return WHILE; }
-return  { yylval = make_empty_node("RETURN"); return RETURN; }
+struct  { yylval = make_empty_node("STRUCT", yylloc); return STRUCT; }
+if      { yylval = make_empty_node("IF", yylloc); return IF; }
+else    { yylval = make_empty_node("ELSE", yylloc); return ELSE; }
+while   { yylval = make_empty_node("WHILE", yylloc); return WHILE; }
+return  { yylval = make_empty_node("RETURN", yylloc); return RETURN; }
 
 {ID_START}{ID_CONTINUE}* { 
-    yylval = make_string_node("ID", yytext);
+    yylval = make_string_node("ID", yylloc, yytext);
     return ID;
 }
 
-"." { yylval = make_empty_node("DOT"); return DOT; }
-";" { yylval = make_empty_node("SEMI"); return SEMI; }
-"," { yylval = make_empty_node("COMMA"); return COMMA; }
+"." { yylval = make_empty_node("DOT", yylloc); return DOT; }
+";" { yylval = make_empty_node("SEMI", yylloc); return SEMI; }
+"," { yylval = make_empty_node("COMMA", yylloc); return COMMA; }
 
-"==" { yylval = make_empty_node("EQ"); return EQ; }
-"!=" { yylval = make_empty_node("NE"); return NE; }
-"=" { yylval = make_empty_node("ASSIGN"); return ASSIGN; }
+"==" { yylval = make_empty_node("EQ", yylloc); return EQ; }
+"!=" { yylval = make_empty_node("NE", yylloc); return NE; }
+"=" { yylval = make_empty_node("ASSIGN", yylloc); return ASSIGN; }
 
-"<=" { yylval = make_empty_node("LE"); return LE; }
-"<" { yylval = make_empty_node("LT"); return LT; }
-">=" { yylval = make_empty_node("GE"); return GE; }
-">" { yylval = make_empty_node("GT"); return GT; }
+"<=" { yylval = make_empty_node("LE", yylloc); return LE; }
+"<" { yylval = make_empty_node("LT", yylloc); return LT; }
+">=" { yylval = make_empty_node("GE", yylloc); return GE; }
+">" { yylval = make_empty_node("GT", yylloc); return GT; }
 
-"+" { yylval = make_empty_node("PLUS"); return PLUS; }
-"-" { yylval = make_empty_node("MINUS"); return MINUS; }
-"*" { yylval = make_empty_node("MUL"); return MUL; }
-"/" { yylval = make_empty_node("DIV"); return DIV; }
-"&&" { yylval = make_empty_node("AND"); return AND; }
-"||" { yylval = make_empty_node("OR"); return OR; }
-"!" { yylval = make_empty_node("NOT"); return NOT; }
+"+" { yylval = make_empty_node("PLUS", yylloc); return PLUS; }
+"-" { yylval = make_empty_node("MINUS", yylloc); return MINUS; }
+"*" { yylval = make_empty_node("MUL", yylloc); return MUL; }
+"/" { yylval = make_empty_node("DIV", yylloc); return DIV; }
+"&&" { yylval = make_empty_node("AND", yylloc); return AND; }
+"||" { yylval = make_empty_node("OR", yylloc); return OR; }
+"!" { yylval = make_empty_node("NOT", yylloc); return NOT; }
 
-"(" { yylval = make_empty_node("LP"); return LP; }
-")" { yylval = make_empty_node("RP"); return RP; }
-"[" { yylval = make_empty_node("LB"); return LB; }
-"]" { yylval = make_empty_node("RB"); return RB; }
-"{" { yylval = make_empty_node("LC"); return LC; }
-"}" { yylval = make_empty_node("RC"); return RC; }
+"(" { yylval = make_empty_node("LP", yylloc); return LP; }
+")" { yylval = make_empty_node("RP", yylloc); return RP; }
+"[" { yylval = make_empty_node("LB", yylloc); return LB; }
+"]" { yylval = make_empty_node("RB", yylloc); return RB; }
+"{" { yylval = make_empty_node("LC", yylloc); return LC; }
+"}" { yylval = make_empty_node("RC", yylloc); return RC; }
 
 [ \r\t] {}
-\n {
-    yycolno = 1;
-}
+\n {}
 . { fprintf(stderr, "unknown symbol: %s\n", yytext); }
