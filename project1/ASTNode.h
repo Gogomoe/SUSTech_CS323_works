@@ -3,6 +3,8 @@
 
 #include "YYLTYPE.h"
 
+extern int error_happen;
+
 enum ASTType {
     EMPTY_LEAF,
     INT_LEAF,
@@ -14,6 +16,7 @@ enum ASTType {
 struct ASTNode {
     enum ASTType type;
     char *name;
+    char *display_value;
     struct ASTNode *next;
     struct YYLTYPE position;
     union {

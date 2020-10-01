@@ -2,6 +2,9 @@
 #include <string.h>
 #include "ASTNode.h"
 
+
+int error_happen = 0;
+
 struct ASTNode *make_empty_node(char *name, struct YYLTYPE position) {
     struct ASTNode *node = calloc(1, sizeof(struct ASTNode));
     node->type = EMPTY_LEAF;
@@ -204,7 +207,10 @@ void __print_ASTTree(struct ASTNode *root, int level) {
         if (root->type != EMPTY_LEAF && root->type != INTERNAL_NODE) {
             printf(": ");
         }
-        if (root->type == INT_LEAF) {
+
+        if (root->display_value != NULL) {
+            printf("%s", root->display_value);
+        }else if (root->type == INT_LEAF) {
             printf("%d", root->int_value);
         } else if (root->type == FLOAT_LEAF) {
             printf("%f", root->float_value);

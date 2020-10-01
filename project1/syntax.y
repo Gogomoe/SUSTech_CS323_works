@@ -2,7 +2,7 @@
 %{
     #include "ASTNode.h"
     #include "lex.yy.c"
-    void yyerror(const char*);
+    void yyerror(const char *s);
     struct ASTNode *program;
 %}
 %define api.value.type {struct ASTNode *}
@@ -55,6 +55,11 @@ ExtDef:
       Specifier ExtDecList SEMI { $$ = make_internal_node3("ExtDef", @$, $1, $2, $3); }
     | Specifier SEMI            { $$ = make_internal_node2("ExtDef", @$, $1, $2); }
     | Specifier FunDec CompSt   { $$ = make_internal_node3("ExtDef", @$, $1, $2, $3); }
+
+    | Specifier ExtDecList error{ printf("Error type B at Line %d: Missing semicolon ';'\n", @2.last_line); }
+    | Specifier error           { printf("Error type B at Line %d: Missing semicolon ';'\n", @1.last_line); }
+    | error ExtDecList SEMI     { printf("Error type B at Line %d: Missing specifier\n", @1.last_line); }
+    | error SEMI                { printf("Error type B at Line %d: Missing specifier\n", @1.last_line); }
     ;
 ExtDecList: 
       VarDec                    { $$ = make_internal_node1("ExtDecList", @$, $1); }
@@ -77,6 +82,9 @@ VarDec:
 FunDec: 
       ID LP VarList RP          { $$ = make_internal_node4("FunDec", @$, $1, $2, $3, $4); }
     | ID LP RP                  { $$ = make_internal_node3("FunDec", @$, $1, $2, $3); }
+
+    | ID LP VarList error       { printf("Error type B at Line %d: Missing closing parenthesis ')'\n", @3.last_line); }
+    | ID LP error               { printf("Error type B at Line %d: Missing closing parenthesis ')'\n", @2.last_line); }
     ;
 VarList: 
       ParamDec COMMA VarList    { $$ = make_internal_node3("VarList", @$, $1, $2, $3); }
@@ -100,6 +108,11 @@ Stmt:
     | IF LP Exp RP Stmt %prec LOWER_ELSE    { $$ = make_internal_node5("Stmt", @$, $1, $2, $3, $4, $5); }
     | IF LP Exp RP Stmt ELSE Stmt           { $$ = make_internal_node7("Stmt", @$, $1, $2, $3, $4, $5, $6, $7); }
     | WHILE LP Exp RP Stmt      { $$ = make_internal_node5("Stmt", @$, $1, $2, $3, $4, $5); }
+
+    | Exp error                 { printf("Error type B at Line %d: Missing semicolon ';'\n", @1.last_line); }
+    | RETURN Exp error          { printf("Error type B at Line %d: Missing semicolon ';'\n", @2.last_line); }
+    | IF LP Exp error Stmt %prec LOWER_ELSE { printf("Error type B at Line %d: Missing closing parenthesis ')'\n", @3.last_line); }
+    | IF LP Exp error Stmt ELSE Stmt        { printf("Error type B at Line %d: Missing closing parenthesis ')'\n", @3.last_line); }
     ;
 
 DefList: 
@@ -143,6 +156,10 @@ Exp:
     | INT                       { $$ = make_internal_node1("Exp", @$, $1); }
     | FLOAT                     { $$ = make_internal_node1("Exp", @$, $1); }
     | CHAR                      { $$ = make_internal_node1("Exp", @$, $1); }
+
+    | LP Exp error              { printf("Error type B at Line %d: Missing closing parenthesis ')'\n", @2.last_line); }
+    | ID LP Args error          { printf("Error type B at Line %d: Missing closing parenthesis ')'\n", @3.last_line); }
+    | ID LP error               { printf("Error type B at Line %d: Missing closing parenthesis ')'\n", @2.last_line); }
     ;
 Args: 
       Exp COMMA Args            { $$ = make_internal_node3("Args", @$, $1, $2, $3); }
@@ -151,8 +168,8 @@ Args:
 
 %%
 
-void yyerror(const char *s){
-    fprintf(stderr, "Syntax error: %s\n", s);
+void yyerror(const char *s) {
+    error_happen = 1;
 }
 
 int main(int argc, char **argv){
@@ -168,8 +185,13 @@ int main(int argc, char **argv){
             return 1;
         }
         // yydebug = 1;
-        yyparse();
-        print_ASTTree(program);
+        int error = yyparse();
+        if (!error && !error_happen) {
+            print_ASTTree(program);
+        }
+        if (error) {
+            fprintf(stderr, "Syntax error\n");
+        }
         return 0;
     }
     else{

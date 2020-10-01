@@ -80,6 +80,7 @@ ID_CONTINUE {ID_START}|[0-9]|{ID_CONTINUE_0}|{ID_CONTINUE_1}|{ID_CONTINUE_2}|{ID
 
 [-]?[0-9]+\.[0-9]+ { 
     yylval = make_float_node("FLOAT", yylloc, strtof(yytext, NULL));
+    yylval->display_value = strdup(yytext);
     return FLOAT; 
 }
 
@@ -92,14 +93,19 @@ ID_CONTINUE {ID_START}|[0-9]|{ID_CONTINUE_0}|{ID_CONTINUE_1}|{ID_CONTINUE_2}|{ID
 }
 
 \'\\x[0-9A-Fa-f]{1,2}\' {
-    char str[5] = "0x";
+    char str[5] = "\\x";
     str[2] = yytext[3];
     if (yytext[4] != '\'') str[3] = yytext[4];
+
+    char* display_value = strdup(str);
+    str[0] = '0';
 
     char c = (char)strtol(str, NULL, 0);
     str[0] = c;
     str[1] = '\0';
     yylval = make_string_node("CHAR", yylloc, str);
+
+    yylval->display_value = display_value;
     return CHAR;
 }
 
@@ -147,6 +153,15 @@ return  { yylval = make_empty_node("RETURN", yylloc); return RETURN; }
 "{" { yylval = make_empty_node("LC", yylloc); return LC; }
 "}" { yylval = make_empty_node("RC", yylloc); return RC; }
 
-[ \r\t] {}
-\n {}
-. { fprintf(stderr, "unknown symbol: %s\n", yytext); }
+[ \t]+ {}
+"\r"|"\r\n"|"\n" {}
+
+"|" { printf("Error type A at Line %d: unknown lexeme %s\n", yylloc.first_line, yytext); error_happen = 1; yylval = make_empty_node("OR", yylloc); return OR; }
+"&" { printf("Error type A at Line %d: unknown lexeme %s\n", yylloc.first_line, yytext); error_happen = 1; yylval = make_empty_node("AND", yylloc); return AND; }
+
+[^ \t\r\n\.;,=<>+\-*/\(\)\[\]\{\}]+ {
+    printf("Error type A at Line %d: unknown lexeme %s\n", yylloc.first_line, yytext);
+    error_happen = 1;
+    yylval = make_string_node("ID", yylloc, yytext);
+    return ID;
+}
