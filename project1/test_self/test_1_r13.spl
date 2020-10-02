@@ -1,0 +1,12 @@
+int test_1_o02() // test comment
+{
+    int a, b; // test comment
+
+    b = a /* test comment inner exp  */ + 10;
+
+    /*
+        multiline comment
+    */
+
+    return b;
+}

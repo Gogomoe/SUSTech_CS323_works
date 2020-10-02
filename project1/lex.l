@@ -14,6 +14,9 @@
                 yylloc.last_column++; \
             } \
         }
+
+    void comment();
+
 %}
 
 ID_START_0 \xC2\xAA|\xC2\xB5|\xC2\xBA|\xC3[\x80-\x96]|\xC3[\x98-\xB6]|\xC3[\xB8-\xBF]|\xC4[\x80-\xBF]|\xC5[\x80-\xBF]|\xC6[\x80-\xBF]|\xC7[\x80-\xBF]|\xC8[\x80-\xBF]|\xC9[\x80-\x81]|\xC9[\x90-\xBF]|\xCA[\x80-\xBF]|\xCB[\x80-\x81]|\xCB[\x86-\x91]|\xCB[\xA0-\xA4]|\xCB\xAE|\xCD\xBA|\xCE\x86|\xCE[\x88-\x8A]|\xCE\x8C|\xCE[\x8E-\xA1]|\xCE[\xA3-\xBF]|\xCF[\x80-\x8E]|\xCF[\x90-\xB5]|\xCF[\xB7-\xBF]|\xD0[\x80-\xBF]|\xD1[\x80-\xBF]|\xD2[\x80-\x81]|\xD2[\x8A-\xBF]|\xD3[\x80-\x8E]|\xD3[\x90-\xB9]|\xD4[\x80-\x8F]|\xD4[\xB1-\xBF]|\xD5[\x80-\x96]|\xD5\x99|\xD5[\xA1-\xBF]|\xD6[\x80-\x87]|\xD7[\x90-\xAA]|\xD7[\xB0-\xB2]|\xD8[\xA1-\xBA]|\xD9[\x80-\x8A]|\xD9[\xAE-\xAF]|\xD9[\xB1-\xBF]|\xDA[\x80-\xBF]|\xDB[\x80-\x93]|\xDB\x95|\xDB[\xA5-\xA6]|\xDB[\xAE-\xAF]|\xDB[\xBA-\xBC]|\xDB\xBF|\xDC\x90|\xDC[\x92-\xAF]|\xDD[\x8D-\xAD]|\xDE[\x80-\xA5]|\xDE\xB1|\xE0\xA4[\x84-\xB9]|\xE0\xA4\xBD|\xE0\xA5\x90|\xE0\xA5[\x98-\xA1]|\xE0\xA5\xBD|\xE0\xA6[\x85-\x8C]|\xE0\xA6[\x8F-\x90]|\xE0\xA6[\x93-\xA8]
@@ -159,9 +162,42 @@ return  { yylval = make_empty_node("RETURN", yylloc); return RETURN; }
 "|" { printf("Error type A at Line %d: unknown lexeme %s\n", yylloc.first_line, yytext); error_happen = 1; yylval = make_empty_node("OR", yylloc); return OR; }
 "&" { printf("Error type A at Line %d: unknown lexeme %s\n", yylloc.first_line, yytext); error_happen = 1; yylval = make_empty_node("AND", yylloc); return AND; }
 
+"//".* {}
+
+"/*" { comment(&yylloc); }
+
 [^ \t\r\n\.;,=<>+\-*/\(\)\[\]\{\}]+ {
     printf("Error type A at Line %d: unknown lexeme %s\n", yylloc.first_line, yytext);
     error_happen = 1;
     yylval = make_string_node("ID", yylloc, yytext);
     return ID;
+}
+
+%%
+
+void comment(YYLTYPE *position) {
+	char c1, c2;
+
+    c1 = input();
+    while (1) {
+        if (c1 != 0) {
+            c2 = input();
+        } else {
+            printf("Error type A at Line %d: Missing closing comment '*/'\n", position->last_line);
+            error_happen = 1;
+            return;
+        }
+        if (c1 == '*' && c2 == '/') {
+            position->last_column += 2;
+            return;
+        }
+        if (c1 == '\n') {
+            position->last_line++;
+            position->last_column = 1;
+        } else {
+            position->last_column++;
+        }
+        c1 = c2;
+    }
+
 }
