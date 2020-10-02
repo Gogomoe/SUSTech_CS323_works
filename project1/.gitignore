@@ -1,0 +1,6 @@
+ast.out
+lex.yy.c
+syntax.output
+syntax.tab.c
+syntax.tab.h
+bin

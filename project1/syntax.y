@@ -58,8 +58,8 @@ ExtDef:
 
     | Specifier ExtDecList error{ printf("Error type B at Line %d: Missing semicolon ';'\n", @2.last_line); }
     | Specifier error           { printf("Error type B at Line %d: Missing semicolon ';'\n", @1.last_line); }
-    | error ExtDecList SEMI     { printf("Error type B at Line %d: Missing specifier\n", @1.last_line); }
-    | error SEMI                { printf("Error type B at Line %d: Missing specifier\n", @1.last_line); }
+    | error ExtDecList SEMI     { printf("Error type B at Line %d: Missing specifier\n", @1.first_line); }
+    | error SEMI                { printf("Error type B at Line %d: Missing specifier\n", @1.first_line); }
     ;
 ExtDecList: 
       VarDec                    { $$ = make_internal_node1("ExtDecList", @$, $1); }
@@ -121,6 +121,9 @@ DefList:
     ;
 Def: 
       Specifier DecList SEMI    { $$ = make_internal_node3("Def", @$, $1, $2, $3); }
+
+    | Specifier DecList error   { printf("Error type B at Line %d: Missing semicolon ';'\n", @2.last_line); }
+    | error DecList SEMI        { printf("Error type B at Line %d: Missing specifier\n", @1.first_line); }
     ;
 DecList: 
       Dec                       { $$ = make_internal_node1("DecList", @$, $1); }
