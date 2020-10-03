@@ -32,6 +32,7 @@
 
 %token STRING STRING_BEGIN STRING_INTERNAL STRING_END
 %token BREAK CONTINUE FOR IN
+%token IMPORT AS
 %token COLON DOUBLE_DOT
 
 %right ASSIGN
@@ -49,8 +50,16 @@
 %%
 
 Program: 
-      ExtDefList                { $$ = make_internal_node1("Program", @$, $1); program = $$; }
+      ImportList ExtDefList     { $$ = make_internal_node2("Program", @$, $1, $2); program = $$; }
     ; 
+ImportList:
+      ImportStmt ImportList     { $$ = make_internal_node2("ImportList", @$, $1, $2); }
+    | %empty                    { $$ = make_internal_node0("ImportList", @$); }
+    ;
+ImportStmt:
+      IMPORT STRING AS ID SEMI  { $$ = make_internal_node5("ImportStmt", @$, $1, $2, $3, $4, $5); }
+    | IMPORT STRING SEMI        { $$ = make_internal_node3("ImportStmt", @$, $1, $2, $3); }
+    ;
 ExtDefList: 
       ExtDef ExtDefList         { $$ = make_internal_node2("ExtDefList", @$, $1, $2); }
     | %empty                    { $$ = make_internal_node0("ExtDefList", @$); }
@@ -173,6 +182,10 @@ Exp:
     | FLOAT                     { $$ = make_internal_node1("Exp", @$, $1); }
     | CHAR                      { $$ = make_internal_node1("Exp", @$, $1); }
     | String                    { $$ = make_internal_node1("Exp", @$, $1); }
+
+    | ID COLON ID               { $$ = make_internal_node3("Exp", @$, $1, $2, $3); }
+    | ID COLON ID LP RP         { $$ = make_internal_node5("Exp", @$, $1, $2, $3, $4, $5); }
+    | ID COLON ID LP Args RP    { $$ = make_internal_node6("Exp", @$, $1, $2, $3, $4, $5, $6); }
 
     | LP Exp error              { printf("Error type B at Line %d: Missing closing parenthesis ')'\n", @2.last_line); }
     | ID LP Args error          { printf("Error type B at Line %d: Missing closing parenthesis ')'\n", @3.last_line); }

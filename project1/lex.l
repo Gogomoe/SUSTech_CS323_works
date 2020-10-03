@@ -132,6 +132,9 @@ in  { yylval = make_empty_node("IN", yylloc); return IN; }
 break  { yylval = make_empty_node("BREAK", yylloc); return BREAK; }
 continue  { yylval = make_empty_node("CONTINUE", yylloc); return CONTINUE; }
 
+import  { yylval = make_empty_node("IMPORT", yylloc); return IMPORT; }
+as  { yylval = make_empty_node("AS", yylloc); return AS; }
+
 {ID_START}{ID_CONTINUE}* { 
     yylval = make_string_node("ID", yylloc, yytext);
     return ID;
