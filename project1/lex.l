@@ -127,6 +127,11 @@ else    { yylval = make_empty_node("ELSE", yylloc); return ELSE; }
 while   { yylval = make_empty_node("WHILE", yylloc); return WHILE; }
 return  { yylval = make_empty_node("RETURN", yylloc); return RETURN; }
 
+for  { yylval = make_empty_node("FOR", yylloc); return FOR; }
+in  { yylval = make_empty_node("IN", yylloc); return IN; }
+break  { yylval = make_empty_node("BREAK", yylloc); return BREAK; }
+continue  { yylval = make_empty_node("CONTINUE", yylloc); return CONTINUE; }
+
 {ID_START}{ID_CONTINUE}* { 
     yylval = make_string_node("ID", yylloc, yytext);
     return ID;
@@ -161,6 +166,9 @@ return  { yylval = make_empty_node("RETURN", yylloc); return RETURN; }
 
 "}" { return close_block(&yylval, &yylloc); }
 
+":" { yylval = make_empty_node("COLON", yylloc); return COLON; }
+".." { yylval = make_empty_node("DOUBLE_DOT", yylloc); return DOUBLE_DOT; }
+
 [ \t]+ {}
 "\r"|"\r\n"|"\n" {}
 
@@ -173,7 +181,7 @@ return  { yylval = make_empty_node("RETURN", yylloc); return RETURN; }
 
 "\"" { return string(&yylval, &yylloc); }
 
-[^ \t\r\n\.;,=<>+\-*/\(\)\[\]\{\}\"]+ {
+[^ \t\r\n\.:;,=<>+\-*/\(\)\[\]\{\}\"]+ {
     printf("Error type A at Line %d: unknown lexeme %s\n", yylloc.first_line, yytext);
     error_happen = 1;
     yylval = make_string_node("ID", yylloc, yytext);

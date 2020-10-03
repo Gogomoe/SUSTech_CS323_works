@@ -31,6 +31,8 @@
 %token LP RP LB RB LC RC
 
 %token STRING STRING_BEGIN STRING_INTERNAL STRING_END
+%token BREAK CONTINUE FOR IN
+%token COLON DOUBLE_DOT
 
 %right ASSIGN
 %left OR
@@ -109,7 +111,16 @@ Stmt:
     | RETURN Exp SEMI           { $$ = make_internal_node3("Stmt", @$, $1, $2, $3); }
     | IF LP Exp RP Stmt %prec LOWER_ELSE    { $$ = make_internal_node5("Stmt", @$, $1, $2, $3, $4, $5); }
     | IF LP Exp RP Stmt ELSE Stmt           { $$ = make_internal_node7("Stmt", @$, $1, $2, $3, $4, $5, $6, $7); }
-    | WHILE LP Exp RP Stmt      { $$ = make_internal_node5("Stmt", @$, $1, $2, $3, $4, $5); }
+    
+    | WHILE LP Exp RP Stmt                  { $$ = make_internal_node5("Stmt", @$, $1, $2, $3, $4, $5); }
+    | ID COLON WHILE LP Exp RP Stmt         { $$ = make_internal_node7("Stmt", @$, $1, $2, $3, $4, $5, $6, $7); }
+    | FOR ID IN INT DOUBLE_DOT INT Stmt               { $$ = make_internal_node7("Stmt", @$, $1, $2, $3, $4, $5, $6, $7); }
+    | ID COLON FOR ID IN INT DOUBLE_DOT INT Stmt      { $$ = make_internal_node9("Stmt", @$, $1, $2, $3, $4, $5, $6, $7, $8, $9); }
+
+    | BREAK SEMI                { $$ = make_internal_node2("Stmt", @$, $1, $2); }
+    | BREAK ID SEMI             { $$ = make_internal_node3("Stmt", @$, $1, $2, $3); }
+    | CONTINUE SEMI             { $$ = make_internal_node2("Stmt", @$, $1, $2); }
+    | CONTINUE ID SEMI          { $$ = make_internal_node3("Stmt", @$, $1, $2, $3); }
 
     | Exp error                 { printf("Error type B at Line %d: Missing semicolon ';'\n", @1.last_line); }
     | RETURN Exp error          { printf("Error type B at Line %d: Missing semicolon ';'\n", @2.last_line); }

@@ -1,0 +1,15 @@
+int test_1_15()
+{
+    while (support_break_and_continue) {
+        continue;
+        break;
+    }
+
+    also_support_label: while (1) {
+        break also_support_label;
+    }
+
+    support_for: for i in 1..10 {
+        continue support_for;
+    }
+}
