@@ -15,7 +15,11 @@
             } \
         }
 
-    void comment();
+    void comment(YYLTYPE *position);
+
+    int string_level = 0;
+    int string(YYSTYPE *value, YYLTYPE *position);
+    int close_block(YYSTYPE *value, YYLTYPE *position);
 
 %}
 
@@ -112,7 +116,7 @@ ID_CONTINUE {ID_START}|[0-9]|{ID_CONTINUE_0}|{ID_CONTINUE_1}|{ID_CONTINUE_2}|{ID
     return CHAR;
 }
 
-int|float|char { 
+int|float|char|string { 
     yylval = make_string_node("TYPE", yylloc, yytext);
     return TYPE;
 }
@@ -154,7 +158,8 @@ return  { yylval = make_empty_node("RETURN", yylloc); return RETURN; }
 "[" { yylval = make_empty_node("LB", yylloc); return LB; }
 "]" { yylval = make_empty_node("RB", yylloc); return RB; }
 "{" { yylval = make_empty_node("LC", yylloc); return LC; }
-"}" { yylval = make_empty_node("RC", yylloc); return RC; }
+
+"}" { return close_block(&yylval, &yylloc); }
 
 [ \t]+ {}
 "\r"|"\r\n"|"\n" {}
@@ -166,7 +171,9 @@ return  { yylval = make_empty_node("RETURN", yylloc); return RETURN; }
 
 "/*" { comment(&yylloc); }
 
-[^ \t\r\n\.;,=<>+\-*/\(\)\[\]\{\}]+ {
+"\"" { return string(&yylval, &yylloc); }
+
+[^ \t\r\n\.;,=<>+\-*/\(\)\[\]\{\}\"]+ {
     printf("Error type A at Line %d: unknown lexeme %s\n", yylloc.first_line, yytext);
     error_happen = 1;
     yylval = make_string_node("ID", yylloc, yytext);
@@ -197,6 +204,121 @@ void comment(YYLTYPE *position) {
         } else {
             position->last_column++;
         }
+        c1 = c2;
+    }
+
+}
+
+int string(YYSTYPE *value, YYLTYPE *position) {
+	char c1, c2;
+    int escape = 0;
+
+    char buff[1000] = "\"";
+    int buff_index = 1;
+
+    c1 = input();
+    while (1) {
+        if (c1 == 0) {
+            printf("Error type A at Line %d: Missing closing string '\"'\n", position->last_line);
+            error_happen = 1;
+            *value = make_string_node("STRING", *position, buff);
+            return STRING;
+        }
+
+        if (c1 == '\n') {
+            unput(c1);
+            printf("Error type A at Line %d: Missing closing string '\"'\n", position->last_line);
+            error_happen = 1;
+            *value = make_string_node("STRING", *position, buff);
+            return STRING;
+        }
+
+        if (c1 == '"' && escape % 2 != 1) {
+            position->last_column++;
+            buff[buff_index++] = c1;
+            *value = make_string_node("STRING", *position, buff);
+            return STRING;
+        }
+
+        c2 = input();
+
+        if (c1 == '$' && c2 == '{' && escape % 2 != 1) {
+            position->last_column += 2;
+            buff[buff_index++] = c1;
+            buff[buff_index++] = c2;
+            string_level++;
+            *value = make_string_node("STRING_BEGIN", *position, buff);
+            return STRING_BEGIN;
+        }
+        
+        if (c1 == '\\') {
+            escape++;
+        } else {
+            escape = 0;
+        }
+
+        buff[buff_index++] = c1;
+        c1 = c2;
+    }
+
+}
+
+int close_block(YYSTYPE *value, YYLTYPE *position) {
+    if (string_level == 0) {
+        *value = make_empty_node("RC", *position);
+        return RC;
+    }
+
+	char c1, c2;
+    int escape = 0;
+
+    char buff[1000] = "}";
+    int buff_index = 1;
+
+    c1 = input();
+    while (1) {
+        if (c1 == 0) {
+            printf("Error type A at Line %d: Missing closing string '\"'\n", position->last_line);
+            error_happen = 1;
+            string_level--;
+            *value = make_string_node("STRING_END", *position, buff);
+            return STRING_END;
+        }
+
+        if (c1 == '\n') {
+            unput(c1);
+            printf("Error type A at Line %d: Missing closing string '\"'\n", position->last_line);
+            error_happen = 1;
+            string_level--;
+            *value = make_string_node("STRING_END", *position, buff);
+            return STRING_END;
+        }
+
+        if (c1 == '"' && escape % 2 != 1) {
+            position->last_column++;
+            buff[buff_index++] = c1;
+            string_level--;
+            *value = make_string_node("STRING_END", *position, buff);
+            return STRING_END;
+        }
+
+        c2 = input();
+
+        if (c1 == '$' && c2 == '{' && escape % 2 != 1) {
+            position->last_column += 2;
+            buff[buff_index++] = c1;
+            buff[buff_index++] = c2;
+            *value = make_string_node("STRING_INTERNAL", *position, buff);
+            return STRING_INTERNAL;
+        }
+        
+        if (c1 == '\\') {
+            escape++;
+        } else {
+            escape = 0;
+        }
+
+        buff[buff_index++] = c1;
         c1 = c2;
     }
 

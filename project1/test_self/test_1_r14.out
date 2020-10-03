@@ -1,0 +1,80 @@
+Program (1)
+  ExtDefList (1)
+    ExtDef (1)
+      Specifier (1)
+        TYPE: string
+      FunDec (1)
+        ID: test_1_14
+        LP
+        RP
+      CompSt (2)
+        LC
+        DefList (3)
+          Def (3)
+            Specifier (3)
+              TYPE: int
+            DecList (3)
+              Dec (3)
+                VarDec (3)
+                  ID: a
+                ASSIGN
+                Exp (3)
+                  INT: 10
+            SEMI
+          DefList (5)
+            Def (5)
+              Specifier (5)
+                TYPE: string
+              DecList (5)
+                Dec (5)
+                  VarDec (5)
+                    ID: b
+                  ASSIGN
+                  Exp (5)
+                    String (5)
+                      STRING: "support string!"
+              SEMI
+            DefList (7)
+              Def (7)
+                Specifier (7)
+                  TYPE: string
+                DecList (7)
+                  Dec (7)
+                    VarDec (7)
+                      ID: c
+                    ASSIGN
+                    Exp (7)
+                      String (7)
+                        STRING_BEGIN: "string template is awesome, a + 10 = ${
+                        StringInternalList (7)
+                          Exp (7)
+                            Exp (7)
+                              ID: a
+                            PLUS
+                            Exp (7)
+                              INT: 10
+                        STRING_END: }"
+                SEMI
+        StmtList (9)
+          Stmt (9)
+            RETURN
+            Exp (9)
+              String (9)
+                STRING_BEGIN: "string template ${
+                StringInternalList (9)
+                  Exp (9)
+                    String (9)
+                      STRING: "can"
+                  STRING_INTERNAL: } ${
+                  StringInternalList (9)
+                    Exp (9)
+                      String (9)
+                        STRING_BEGIN: "${
+                        StringInternalList (9)
+                          Exp (9)
+                            String (9)
+                              STRING: "nesting"
+                        STRING_END: }"
+                STRING_END: }!"
+            SEMI
+        RC

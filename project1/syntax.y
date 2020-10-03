@@ -30,6 +30,8 @@
 %token PLUS MINUS MUL DIV AND OR NOT
 %token LP RP LB RB LC RC
 
+%token STRING STRING_BEGIN STRING_INTERNAL STRING_END
+
 %right ASSIGN
 %left OR
 %left AND
@@ -159,6 +161,7 @@ Exp:
     | INT                       { $$ = make_internal_node1("Exp", @$, $1); }
     | FLOAT                     { $$ = make_internal_node1("Exp", @$, $1); }
     | CHAR                      { $$ = make_internal_node1("Exp", @$, $1); }
+    | String                    { $$ = make_internal_node1("Exp", @$, $1); }
 
     | LP Exp error              { printf("Error type B at Line %d: Missing closing parenthesis ')'\n", @2.last_line); }
     | ID LP Args error          { printf("Error type B at Line %d: Missing closing parenthesis ')'\n", @3.last_line); }
@@ -167,6 +170,16 @@ Exp:
 Args: 
       Exp COMMA Args            { $$ = make_internal_node3("Args", @$, $1, $2, $3); }
     | Exp                       { $$ = make_internal_node1("Args", @$, $1); }
+    ;
+
+String:
+      STRING                                      { $$ = make_internal_node1("String", @$, $1); }
+    | STRING_BEGIN StringInternalList STRING_END  { $$ = make_internal_node3("String", @$, $1, $2, $3); }
+    ;
+
+StringInternalList:
+      Exp                                         { $$ = make_internal_node1("StringInternalList", @$, $1); }
+    | Exp STRING_INTERNAL StringInternalList      { $$ = make_internal_node3("StringInternalList", @$, $1, $2, $3); }
     ;
 
 %%
