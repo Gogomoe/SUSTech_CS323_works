@@ -1,0 +1,72 @@
+Program (1)
+  ExtDefList (1)
+    ExtDef (1)
+      Specifier (1)
+        TYPE: int
+      FunDec (1)
+        ID: foo
+        LP
+        RP
+      CompSt (1)
+        LC
+        DefList (2)
+          Def (2)
+            Specifier (2)
+              TYPE: int
+            DecList (2)
+              Dec (2)
+                VarDec (2)
+                  ID: 支持Unicode变量名
+                ASSIGN
+                Exp (2)
+                  INT: 10
+            SEMI
+          DefList (3)
+            Def (3)
+              Specifier (3)
+                TYPE: int
+              DecList (3)
+                Dec (3)
+                  VarDec (3)
+                    ID: 根据UAX31标准
+                  ASSIGN
+                  Exp (3)
+                    INT: 10
+              SEMI
+            DefList (4)
+              Def (4)
+                Specifier (4)
+                  TYPE: int
+                DecList (4)
+                  Dec (4)
+                    VarDec (4)
+                      ID: 当然不仅仅是中文_你好_こんにちは_안녕하세요_Приbaiвет
+                SEMI
+              DefList (5)
+                Def (5)
+                  Specifier (5)
+                    TYPE: int
+                  DecList (5)
+                    Dec (5)
+                      VarDec (5)
+                        ID: 也不是什么字符都行
+                  SEMI
+                DefList (6)
+                  Def (6)
+                    Specifier (6)
+                      TYPE: int
+                    DecList (6)
+                      Dec (6)
+                        VarDec (6)
+                          ID: 比如中文逗号就没法作为变量名的一部分
+                    SEMI
+                  DefList (7)
+                    Def (7)
+                      Specifier (7)
+                        TYPE: int
+                      DecList (7)
+                        Dec (7)
+                          VarDec (7)
+                            ID: 因为Flex限制_只支持UTF_8的输入
+                      SEMI
+        RC

@@ -1,0 +1,30 @@
+struct Node {
+    int value;
+    struct Node next;
+};
+
+struct Node create_list() {
+    struct Node n;
+    return n;
+}
+
+int append_list(struct Node head, int value) {
+    struct Node n;
+    n.value = value;
+
+    while (head.next != 0) {
+        head = head.next;
+    }
+    head.next = value;
+
+    return 0;
+}
+
+int remove_list(struct Node head) {
+    while (head.next != 0) {
+        head = head.next;
+    }
+    head.next = 0;
+
+    return 0;
+}

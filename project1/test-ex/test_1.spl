@@ -1,0 +1,14 @@
+// support comment!
+
+int foo() {
+    int x = a
+
+    /*
+      also support multiline comment!
+    */
+
+    + 5;
+
+    // return 0;
+
+}

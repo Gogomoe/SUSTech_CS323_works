@@ -1,0 +1,14 @@
+import "a.spl";         // mixin all ExtDef
+import "b.spl" as m;    // with name space
+
+int foo()
+{
+    int x = var_from_a; // variable defined in a.spl
+    foo();              // method import from a.spl
+
+    m:foo();            // namespace to avoid name conflict
+    m:bar + 10;
+    m:baz("args");
+
+    return 0;
+}

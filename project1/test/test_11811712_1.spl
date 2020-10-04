@@ -1,0 +1,10 @@
+int foo() {
+    int a = 10;
+    int 3a = 3 * a;
+
+    int b = 0xAB;
+    int c = 0xAZ;
+
+    char d = '\x05';
+    char e = '\xg5';
+}

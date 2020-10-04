@@ -1,0 +1,10 @@
+string test_3()
+{
+    int a = 5;
+
+    string b = "support string!";
+
+    string c = "string template is awesome, a + 10 = ${ a + 10 }";
+
+    return "string template ${ "can" } ${ "${ "nesting" }" }!";
+}

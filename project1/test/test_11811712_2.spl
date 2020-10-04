@@ -1,0 +1,22 @@
+int foo() {
+    if (a > 10) {
+        return x
+    }
+}
+
+float bar() {
+    if (b == 3) {
+        return ((2 > 3) + 4 * 5;
+    }
+}
+
+int baz() {
+    int a, b;
+    missing_type;
+    char c;
+
+    if (x == 4) {
+        a = 6
+    }
+}
+
