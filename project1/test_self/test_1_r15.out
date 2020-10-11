@@ -2,7 +2,7 @@ Program (1)
   ExtDefList (1)
     ExtDef (1)
       Specifier (1)
-        TYPE: string
+        TYPE: int
       FunDec (1)
         ID: test_1_15
         LP

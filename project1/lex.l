@@ -96,6 +96,7 @@ ID_CONTINUE {ID_START}|[0-9]|{ID_CONTINUE_0}|{ID_CONTINUE_1}|{ID_CONTINUE_2}|{ID
     str[0] = yytext[1];
     str[1] = '\0';
     yylval = make_string_node("CHAR", yylloc, str);
+    yylval->display_value = strdup(yytext);
     return CHAR;
 }
 
