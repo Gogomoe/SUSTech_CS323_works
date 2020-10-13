@@ -229,7 +229,8 @@ int main(int argc, char **argv){
         // yydebug = 1;
         int error = yyparse();
         if (!error && !error_happen) {
-            print_ASTTree(program);
+            ASTPrinter printer;
+            printer.visit_node(program);
         }
         if (error) {
             fprintf(stderr, "Syntax error\n");
