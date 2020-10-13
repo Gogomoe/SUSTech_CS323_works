@@ -2,6 +2,8 @@
 #define AST_H
 
 #include "YYLTYPE.h"
+#include <string>
+#include <vector>
 
 extern int error_happen;
 
@@ -15,46 +17,45 @@ enum ASTType {
 
 struct ASTNode {
     enum ASTType type;
-    char *name;
-    char *display_value;
-    struct ASTNode *next;
+    std::string name;
+    std::string display_value;
     struct YYLTYPE position;
-    union {
-        int int_value;
-        float float_value;
-        char *string_value;
-        struct ASTNode *child;
-    };
+
+    int int_value;
+    float float_value;
+    std::string string_value;
+
+    std::vector<ASTNode *> children;
 };
 
-struct ASTNode *make_empty_node(char *name, struct YYLTYPE position);
+struct ASTNode *make_empty_node(const std::string &name, struct YYLTYPE position);
 
-struct ASTNode *make_int_node(char *name, struct YYLTYPE position, int value);
+struct ASTNode *make_int_node(const std::string &name, struct YYLTYPE position, int value);
 
-struct ASTNode *make_float_node(char *name, struct YYLTYPE position, float value);
+struct ASTNode *make_float_node(const std::string &name, struct YYLTYPE position, float value);
 
-struct ASTNode *make_string_node(char *name, struct YYLTYPE position, char *value);
+struct ASTNode *make_string_node(const std::string &name, struct YYLTYPE position, const std::string &value);
 
 struct ASTNode *make_internal_node0(
-        char *name,
+        const std::string &name,
         struct YYLTYPE position
 );
 
 struct ASTNode *make_internal_node1(
-        char *name,
+        const std::string &name,
         struct YYLTYPE position,
         struct ASTNode *node1
 );
 
 struct ASTNode *make_internal_node2(
-        char *name,
+        const std::string &name,
         struct YYLTYPE position,
         struct ASTNode *node1,
         struct ASTNode *node2
 );
 
 struct ASTNode *make_internal_node3(
-        char *name,
+        const std::string &name,
         struct YYLTYPE position,
         struct ASTNode *node1,
         struct ASTNode *node2,
@@ -62,7 +63,7 @@ struct ASTNode *make_internal_node3(
 );
 
 struct ASTNode *make_internal_node4(
-        char *name,
+        const std::string &name,
         struct YYLTYPE position,
         struct ASTNode *node1,
         struct ASTNode *node2,
@@ -71,7 +72,7 @@ struct ASTNode *make_internal_node4(
 );
 
 struct ASTNode *make_internal_node5(
-        char *name,
+        const std::string &name,
         struct YYLTYPE position,
         struct ASTNode *node1,
         struct ASTNode *node2,
@@ -81,7 +82,7 @@ struct ASTNode *make_internal_node5(
 );
 
 struct ASTNode *make_internal_node6(
-        char *name,
+        const std::string &name,
         struct YYLTYPE position,
         struct ASTNode *node1,
         struct ASTNode *node2,
@@ -92,7 +93,7 @@ struct ASTNode *make_internal_node6(
 );
 
 struct ASTNode *make_internal_node7(
-        char *name,
+        const std::string &name,
         struct YYLTYPE position,
         struct ASTNode *node1,
         struct ASTNode *node2,
@@ -104,7 +105,7 @@ struct ASTNode *make_internal_node7(
 );
 
 struct ASTNode *make_internal_node8(
-        char *name,
+        const std::string &name,
         struct YYLTYPE position,
         struct ASTNode *node1,
         struct ASTNode *node2,
@@ -117,7 +118,7 @@ struct ASTNode *make_internal_node8(
 );
 
 struct ASTNode *make_internal_node9(
-        char *name,
+        const std::string &name,
         struct YYLTYPE position,
         struct ASTNode *node1,
         struct ASTNode *node2,
@@ -131,7 +132,7 @@ struct ASTNode *make_internal_node9(
 );
 
 struct ASTNode *make_internal_node10(
-        char *name,
+        const std::string &name,
         struct YYLTYPE position,
         struct ASTNode *node1,
         struct ASTNode *node2,

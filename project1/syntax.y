@@ -1,7 +1,9 @@
 %locations
 %{
-    #include "ASTNode.h"
-    #include "lex.yy.c"
+    #include "ASTNode.hpp"
+    extern "C" {
+      #include "lex.yy.c"
+    }
     void yyerror(const char *s);
     struct ASTNode *program;
 %}

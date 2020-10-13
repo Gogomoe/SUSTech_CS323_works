@@ -1,6 +1,6 @@
 %{
     #include "syntax.tab.h"
-    #include "ASTNode.h"
+    #include "ASTNode.hpp"
 
     #define YY_USER_ACTION \
         yylloc.first_line = yylloc.last_line; \
@@ -197,10 +197,10 @@ as  { yylval = make_empty_node("AS", yylloc); return AS; }
 void comment(YYLTYPE *position) {
 	char c1, c2;
 
-    c1 = input();
+    c1 = yyinput();
     while (1) {
         if (c1 != 0) {
-            c2 = input();
+            c2 = yyinput();
         } else {
             printf("Error type A at Line %d: Missing closing comment '*/'\n", position->last_line);
             error_happen = 1;
@@ -228,7 +228,7 @@ int string(YYSTYPE *value, YYLTYPE *position) {
     char buff[1000] = "\"";
     int buff_index = 1;
 
-    c1 = input();
+    c1 = yyinput();
     while (1) {
         if (c1 == 0) {
             printf("Error type A at Line %d: Missing closing string '\"'\n", position->last_line);
@@ -252,7 +252,7 @@ int string(YYSTYPE *value, YYLTYPE *position) {
             return STRING;
         }
 
-        c2 = input();
+        c2 = yyinput();
 
         if (c1 == '$' && c2 == '{' && escape % 2 != 1) {
             position->last_column += 2;
@@ -287,7 +287,7 @@ int close_block(YYSTYPE *value, YYLTYPE *position) {
     char buff[1000] = "}";
     int buff_index = 1;
 
-    c1 = input();
+    c1 = yyinput();
     while (1) {
         if (c1 == 0) {
             printf("Error type A at Line %d: Missing closing string '\"'\n", position->last_line);
@@ -314,7 +314,7 @@ int close_block(YYSTYPE *value, YYLTYPE *position) {
             return STRING_END;
         }
 
-        c2 = input();
+        c2 = yyinput();
 
         if (c1 == '$' && c2 == '{' && escape % 2 != 1) {
             position->last_column += 2;
