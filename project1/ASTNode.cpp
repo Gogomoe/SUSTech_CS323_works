@@ -3,6 +3,7 @@
 
 using std::string;
 using std::vector;
+using std::initializer_list;
 
 int error_happen = 0;
 
@@ -41,234 +42,20 @@ struct ASTNode *make_string_node(const string &name, struct YYLTYPE position, co
     return node;
 }
 
-struct ASTNode *make_internal_node0(
+struct ASTNode *make_internal_node(
         const string &name,
-        struct YYLTYPE position
+        struct YYLTYPE position,
+        initializer_list<ASTNode *> children
 ) {
     struct ASTNode *node = new ASTNode;
     node->type = INTERNAL_NODE;
     node->name = name;
     node->position = position;
-    return node;
-}
 
-struct ASTNode *make_internal_node1(
-        const string &name,
-        struct YYLTYPE position,
-        struct ASTNode *node1) {
-    struct ASTNode *node = new ASTNode;
-    node->type = INTERNAL_NODE;
-    node->name = name;
-    node->position = position;
-    node->children.push_back(node1);
-    return node;
-}
+    for (auto child : children) {
+        node->children.push_back(child);
+    }
 
-struct ASTNode *make_internal_node2(
-        const string &name,
-        struct YYLTYPE position,
-        struct ASTNode *node1,
-        struct ASTNode *node2
-) {
-    struct ASTNode *node = new ASTNode;
-    node->type = INTERNAL_NODE;
-    node->name = name;
-    node->position = position;
-    node->children.push_back(node1);
-    node->children.push_back(node2);
-    return node;
-}
-
-struct ASTNode *make_internal_node3(
-        const string &name,
-        struct YYLTYPE position,
-        struct ASTNode *node1,
-        struct ASTNode *node2,
-        struct ASTNode *node3
-) {
-    struct ASTNode *node = new ASTNode;
-    node->type = INTERNAL_NODE;
-    node->name = name;
-    node->position = position;
-    node->children.push_back(node1);
-    node->children.push_back(node2);
-    node->children.push_back(node3);
-    return node;
-}
-
-struct ASTNode *make_internal_node4(
-        const string &name,
-        struct YYLTYPE position,
-        struct ASTNode *node1,
-        struct ASTNode *node2,
-        struct ASTNode *node3,
-        struct ASTNode *node4
-) {
-    struct ASTNode *node = new ASTNode;
-    node->type = INTERNAL_NODE;
-    node->name = name;
-    node->position = position;
-    node->children.push_back(node1);
-    node->children.push_back(node2);
-    node->children.push_back(node3);
-    node->children.push_back(node4);
-    return node;
-}
-
-struct ASTNode *make_internal_node5(
-        const string &name,
-        struct YYLTYPE position,
-        struct ASTNode *node1,
-        struct ASTNode *node2,
-        struct ASTNode *node3,
-        struct ASTNode *node4,
-        struct ASTNode *node5
-) {
-    struct ASTNode *node = new ASTNode;
-    node->type = INTERNAL_NODE;
-    node->name = name;
-    node->position = position;
-    node->children.push_back(node1);
-    node->children.push_back(node2);
-    node->children.push_back(node3);
-    node->children.push_back(node4);
-    node->children.push_back(node5);
-    return node;
-}
-
-
-struct ASTNode *make_internal_node6(
-        const string &name,
-        struct YYLTYPE position,
-        struct ASTNode *node1,
-        struct ASTNode *node2,
-        struct ASTNode *node3,
-        struct ASTNode *node4,
-        struct ASTNode *node5,
-        struct ASTNode *node6
-) {
-    struct ASTNode *node = new ASTNode;
-    node->type = INTERNAL_NODE;
-    node->name = name;
-    node->position = position;
-    node->children.push_back(node1);
-    node->children.push_back(node2);
-    node->children.push_back(node3);
-    node->children.push_back(node4);
-    node->children.push_back(node5);
-    node->children.push_back(node6);
-    return node;
-}
-
-struct ASTNode *make_internal_node7(
-        const string &name,
-        struct YYLTYPE position,
-        struct ASTNode *node1,
-        struct ASTNode *node2,
-        struct ASTNode *node3,
-        struct ASTNode *node4,
-        struct ASTNode *node5,
-        struct ASTNode *node6,
-        struct ASTNode *node7
-) {
-    struct ASTNode *node = new ASTNode;
-    node->type = INTERNAL_NODE;
-    node->name = name;
-    node->position = position;
-    node->children.push_back(node1);
-    node->children.push_back(node2);
-    node->children.push_back(node3);
-    node->children.push_back(node4);
-    node->children.push_back(node5);
-    node->children.push_back(node6);
-    node->children.push_back(node7);
-    return node;
-}
-
-struct ASTNode *make_internal_node8(
-        const string &name,
-        struct YYLTYPE position,
-        struct ASTNode *node1,
-        struct ASTNode *node2,
-        struct ASTNode *node3,
-        struct ASTNode *node4,
-        struct ASTNode *node5,
-        struct ASTNode *node6,
-        struct ASTNode *node7,
-        struct ASTNode *node8
-) {
-    struct ASTNode *node = new ASTNode;
-    node->type = INTERNAL_NODE;
-    node->name = name;
-    node->position = position;
-    node->children.push_back(node1);
-    node->children.push_back(node2);
-    node->children.push_back(node3);
-    node->children.push_back(node4);
-    node->children.push_back(node5);
-    node->children.push_back(node6);
-    node->children.push_back(node7);
-    node->children.push_back(node8);
-    return node;
-}
-
-struct ASTNode *make_internal_node9(
-        const string &name,
-        struct YYLTYPE position,
-        struct ASTNode *node1,
-        struct ASTNode *node2,
-        struct ASTNode *node3,
-        struct ASTNode *node4,
-        struct ASTNode *node5,
-        struct ASTNode *node6,
-        struct ASTNode *node7,
-        struct ASTNode *node8,
-        struct ASTNode *node9
-) {
-    struct ASTNode *node = new ASTNode;
-    node->type = INTERNAL_NODE;
-    node->name = name;
-    node->position = position;
-    node->children.push_back(node1);
-    node->children.push_back(node2);
-    node->children.push_back(node3);
-    node->children.push_back(node4);
-    node->children.push_back(node5);
-    node->children.push_back(node6);
-    node->children.push_back(node7);
-    node->children.push_back(node8);
-    node->children.push_back(node9);
-    return node;
-}
-
-struct ASTNode *make_internal_node10(
-        const string &name,
-        struct YYLTYPE position,
-        struct ASTNode *node1,
-        struct ASTNode *node2,
-        struct ASTNode *node3,
-        struct ASTNode *node4,
-        struct ASTNode *node5,
-        struct ASTNode *node6,
-        struct ASTNode *node7,
-        struct ASTNode *node8,
-        struct ASTNode *node9,
-        struct ASTNode *node10
-) {
-    struct ASTNode *node = new ASTNode;
-    node->type = INTERNAL_NODE;
-    node->name = name;
-    node->position = position;
-    node->children.push_back(node1);
-    node->children.push_back(node2);
-    node->children.push_back(node3);
-    node->children.push_back(node4);
-    node->children.push_back(node5);
-    node->children.push_back(node6);
-    node->children.push_back(node7);
-    node->children.push_back(node8);
-    node->children.push_back(node9);
-    node->children.push_back(node10);
     return node;
 }
 
