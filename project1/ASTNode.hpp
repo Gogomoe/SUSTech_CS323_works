@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 #include <initializer_list>
+#include <map>
+#include <any>
 
 extern int error_happen;
 
@@ -22,10 +24,9 @@ struct ASTNode {
     std::string display_value{};
     struct YYLTYPE position{};
 
-    int int_value{};
-    float float_value{};
-    std::string string_value{};
+    std::map<std::string, std::any> attributes{};
 
+    struct ASTNode *parent{};
     std::vector<ASTNode *> children{};
 };
 
