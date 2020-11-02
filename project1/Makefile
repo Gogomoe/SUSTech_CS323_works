@@ -9,6 +9,7 @@ BISON=bison
 .syntax: syntax.y
 	$(BISON) -v -t -d syntax.y
 splc: .lex .syntax
-	mkdir -p bin && $(CXX) syntax.tab.c ASTNode.cpp -lfl -ly -o bin/splc
+	mkdir -p bin && $(CXX) syntax.tab.c ASTNode.cpp SemanticAnalyzer.cpp -lfl -ly -o bin/splc
 clean:
 	@rm -f lex.yy.c syntax.tab.* *.out *.so
+all: splc

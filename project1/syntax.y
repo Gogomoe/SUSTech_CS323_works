@@ -1,6 +1,7 @@
 %locations
 %{
     #include "ASTNode.hpp"
+    #include "SemanticAnalyzer.hpp"
     extern "C" {
       #include "lex.yy.c"
     }
@@ -231,6 +232,8 @@ int main(int argc, char **argv){
         if (!error && !error_happen) {
             ASTPrinter printer;
             printer.visit_node(program);
+            ASTAnalyzer analyzer(program);
+            analyzer.analyse();
         }
         if (error) {
             fprintf(stderr, "Syntax error\n");
