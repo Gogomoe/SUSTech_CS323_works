@@ -1,0 +1,326 @@
+Grammar
+
+    0 $accept: Json $end
+
+    1 Json: Value
+
+    2 Value: Object
+    3      | Array
+    4      | STRING
+    5      | NUMBER
+    6      | TRUE
+    7      | FALSE
+    8      | VNULL
+
+    9 Object: LC RC
+   10       | LC Members RC
+
+   11 Members: Member
+   12        | Member COMMA Members
+
+   13 Member: STRING COLON Value
+
+   14 Array: LB RB
+   15      | LB Values RB
+
+   16 Values: Value
+   17       | Value COMMA Values
+
+
+Terminals, with rules where they appear
+
+    $end (0) 0
+    error (256)
+    LC (258) 9 10
+    RC (259) 9 10
+    LB (260) 14 15
+    RB (261) 14 15
+    COLON (262) 13
+    COMMA (263) 12 17
+    STRING (264) 4 13
+    NUMBER (265) 5
+    TRUE (266) 6
+    FALSE (267) 7
+    VNULL (268) 8
+
+
+Nonterminals, with rules where they appear
+
+    $accept (14)
+        on left: 0
+    Json (15)
+        on left: 1
+        on right: 0
+    Value (16)
+        on left: 2 3 4 5 6 7 8
+        on right: 1 13 16 17
+    Object (17)
+        on left: 9 10
+        on right: 2
+    Members (18)
+        on left: 11 12
+        on right: 10 12
+    Member (19)
+        on left: 13
+        on right: 11 12
+    Array (20)
+        on left: 14 15
+        on right: 3
+    Values (21)
+        on left: 16 17
+        on right: 15 17
+
+
+State 0
+
+    0 $accept: . Json $end
+
+    LC      shift, and go to state 1
+    LB      shift, and go to state 2
+    STRING  shift, and go to state 3
+    NUMBER  shift, and go to state 4
+    TRUE    shift, and go to state 5
+    FALSE   shift, and go to state 6
+    VNULL   shift, and go to state 7
+
+    Json    go to state 8
+    Value   go to state 9
+    Object  go to state 10
+    Array   go to state 11
+
+
+State 1
+
+    9 Object: LC . RC
+   10       | LC . Members RC
+
+    RC      shift, and go to state 12
+    STRING  shift, and go to state 13
+
+    Members  go to state 14
+    Member   go to state 15
+
+
+State 2
+
+   14 Array: LB . RB
+   15      | LB . Values RB
+
+    LC      shift, and go to state 1
+    LB      shift, and go to state 2
+    RB      shift, and go to state 16
+    STRING  shift, and go to state 3
+    NUMBER  shift, and go to state 4
+    TRUE    shift, and go to state 5
+    FALSE   shift, and go to state 6
+    VNULL   shift, and go to state 7
+
+    Value   go to state 17
+    Object  go to state 10
+    Array   go to state 11
+    Values  go to state 18
+
+
+State 3
+
+    4 Value: STRING .
+
+    $default  reduce using rule 4 (Value)
+
+
+State 4
+
+    5 Value: NUMBER .
+
+    $default  reduce using rule 5 (Value)
+
+
+State 5
+
+    6 Value: TRUE .
+
+    $default  reduce using rule 6 (Value)
+
+
+State 6
+
+    7 Value: FALSE .
+
+    $default  reduce using rule 7 (Value)
+
+
+State 7
+
+    8 Value: VNULL .
+
+    $default  reduce using rule 8 (Value)
+
+
+State 8
+
+    0 $accept: Json . $end
+
+    $end  shift, and go to state 19
+
+
+State 9
+
+    1 Json: Value .
+
+    $default  reduce using rule 1 (Json)
+
+
+State 10
+
+    2 Value: Object .
+
+    $default  reduce using rule 2 (Value)
+
+
+State 11
+
+    3 Value: Array .
+
+    $default  reduce using rule 3 (Value)
+
+
+State 12
+
+    9 Object: LC RC .
+
+    $default  reduce using rule 9 (Object)
+
+
+State 13
+
+   13 Member: STRING . COLON Value
+
+    COLON  shift, and go to state 20
+
+
+State 14
+
+   10 Object: LC Members . RC
+
+    RC  shift, and go to state 21
+
+
+State 15
+
+   11 Members: Member .
+   12        | Member . COMMA Members
+
+    COMMA  shift, and go to state 22
+
+    $default  reduce using rule 11 (Members)
+
+
+State 16
+
+   14 Array: LB RB .
+
+    $default  reduce using rule 14 (Array)
+
+
+State 17
+
+   16 Values: Value .
+   17       | Value . COMMA Values
+
+    COMMA  shift, and go to state 23
+
+    $default  reduce using rule 16 (Values)
+
+
+State 18
+
+   15 Array: LB Values . RB
+
+    RB  shift, and go to state 24
+
+
+State 19
+
+    0 $accept: Json $end .
+
+    $default  accept
+
+
+State 20
+
+   13 Member: STRING COLON . Value
+
+    LC      shift, and go to state 1
+    LB      shift, and go to state 2
+    STRING  shift, and go to state 3
+    NUMBER  shift, and go to state 4
+    TRUE    shift, and go to state 5
+    FALSE   shift, and go to state 6
+    VNULL   shift, and go to state 7
+
+    Value   go to state 25
+    Object  go to state 10
+    Array   go to state 11
+
+
+State 21
+
+   10 Object: LC Members RC .
+
+    $default  reduce using rule 10 (Object)
+
+
+State 22
+
+   12 Members: Member COMMA . Members
+
+    STRING  shift, and go to state 13
+
+    Members  go to state 26
+    Member   go to state 15
+
+
+State 23
+
+   17 Values: Value COMMA . Values
+
+    LC      shift, and go to state 1
+    LB      shift, and go to state 2
+    STRING  shift, and go to state 3
+    NUMBER  shift, and go to state 4
+    TRUE    shift, and go to state 5
+    FALSE   shift, and go to state 6
+    VNULL   shift, and go to state 7
+
+    Value   go to state 17
+    Object  go to state 10
+    Array   go to state 11
+    Values  go to state 27
+
+
+State 24
+
+   15 Array: LB Values RB .
+
+    $default  reduce using rule 15 (Array)
+
+
+State 25
+
+   13 Member: STRING COLON Value .
+
+    $default  reduce using rule 13 (Member)
+
+
+State 26
+
+   12 Members: Member COMMA Members .
+
+    $default  reduce using rule 12 (Members)
+
+
+State 27
+
+   17 Values: Value COMMA Values .
+
+    $default  reduce using rule 17 (Values)
