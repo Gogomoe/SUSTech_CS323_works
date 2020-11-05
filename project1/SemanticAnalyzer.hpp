@@ -3,12 +3,127 @@
 
 #include "ASTNode.hpp"
 
+class Type {
+public:
+    std::string name;
+
+    explicit Type(std::string);
+
+    virtual std::string getName();
+};
+
+class IntType : public Type {
+public:
+    IntType();
+};
+
+class FloatType : public Type {
+public:
+    FloatType();
+};
+
+class CharType : public Type {
+public:
+    CharType();
+};
+
+class StringType : public Type {
+public:
+    StringType();
+};
+
+
+class ArrayType : public Type {
+public:
+    Type type;
+    int size;
+
+    ArrayType(Type, int);
+};
+
+class StructType : public Type {
+public:
+    std::string identify;
+    std::vector<std::pair<std::string, Type *>> fields;
+
+    explicit StructType(const std::string &, std::vector<std::pair<std::string, Type *>>);
+};
+
+class FunctionType : public Type {
+public:
+    Type *returns;
+    std::vector<std::pair<std::string, Type *>> parameters;
+
+    explicit FunctionType(Type *, std::vector<std::pair<std::string, Type *>>);
+};
+
 class ASTAnalyzer : public ASTVisitor {
     ASTNode *root;
+    std::map<std::string, StructType *> typeTable{};
+    std::map<std::string, FunctionType *> functionTable{};
+
+    std::vector<std::optional<std::string>> loopTable{};
+
+    std::vector<std::map<std::string, Type *>> symbolTableStack{};
+
+    std::map<std::string, Type *> &getSymbolTable();
+
+    void pushSymbolTable();
+
+    void popSymbolTable();
+
+    std::optional<Type *> findSymbol(const std::string &);
+
 public:
-    ASTAnalyzer(ASTNode *);
+    explicit ASTAnalyzer(ASTNode *);
 
     void analyse();
+
+//    void visit_node(ASTNode *);
+//    void visit_children(ASTNode *);
+//    void visit_token(ASTNode *);
+//
+//    void visit_Program(ASTNode *);
+//    void visit_ImportList(ASTNode *);
+//    void visit_ImportStmt(ASTNode *);
+    void visit_ExtDefList(ASTNode *);
+
+    void visit_ExtDef(ASTNode *);
+
+    void visit_ExtDecList(ASTNode *);
+
+    void visit_Specifier(ASTNode *);
+
+    void visit_StructSpecifier(ASTNode *);
+
+    void visit_VarDec(ASTNode *);
+
+    void visit_FunDec(ASTNode *);
+
+    void visit_VarList(ASTNode *);
+
+    void visit_ParamDec(ASTNode *);
+
+    void visit_CompSt(ASTNode *);
+
+    void visit_StmtList(ASTNode *);
+
+    void visit_Stmt(ASTNode *);
+
+    void visit_DefList(ASTNode *);
+
+    void visit_Def(ASTNode *);
+
+    void visit_DecList(ASTNode *);
+
+    void visit_Dec(ASTNode *);
+
+    void visit_Exp(ASTNode *);
+
+    void visit_Args(ASTNode *);
+
+//    void visit_String(ASTNode *);
+//    void visit_StringInternalList(ASTNode *);
 };
 
 #endif //SEMANTIC_ANALYZER_HPP

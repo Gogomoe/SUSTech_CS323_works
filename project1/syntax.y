@@ -126,8 +126,8 @@ Stmt:
     
     | WHILE LP Exp RP Stmt                  { $$ = make_internal_node("Stmt", @$, {$1, $2, $3, $4, $5}); }
     | ID COLON WHILE LP Exp RP Stmt         { $$ = make_internal_node("Stmt", @$, {$1, $2, $3, $4, $5, $6, $7}); }
-    | FOR ID IN INT DOUBLE_DOT INT Stmt               { $$ = make_internal_node("Stmt", @$, {$1, $2, $3, $4, $5, $6, $7}); }
-    | ID COLON FOR ID IN INT DOUBLE_DOT INT Stmt      { $$ = make_internal_node("Stmt", @$, {$1, $2, $3, $4, $5, $6, $7, $8, $9}); }
+    | FOR ID IN Exp DOUBLE_DOT Exp CompSt               { $$ = make_internal_node("Stmt", @$, {$1, $2, $3, $4, $5, $6, $7}); }
+    | ID COLON FOR ID IN Exp DOUBLE_DOT Exp CompSt      { $$ = make_internal_node("Stmt", @$, {$1, $2, $3, $4, $5, $6, $7, $8, $9}); }
 
     | BREAK SEMI                { $$ = make_internal_node("Stmt", @$, {$1, $2}); }
     | BREAK ID SEMI             { $$ = make_internal_node("Stmt", @$, {$1, $2, $3}); }
@@ -230,12 +230,14 @@ int main(int argc, char **argv){
         // yydebug = 1;
         int error = yyparse();
         if (!error && !error_happen) {
-            ASTPrinter printer;
-            printer.visit_node(program);
             ASTAnalyzer analyzer(program);
             analyzer.analyse();
-        }
-        if (error) {
+
+            if (!error_happen) {
+                ASTPrinter printer;
+                printer.visit_node(program);
+            }
+        } else if (error) {
             fprintf(stderr, "Syntax error\n");
         }
         return 0;
