@@ -331,7 +331,7 @@ void ASTAnalyzer::visit_StructSpecifier(ASTNode *node) {
             printf("Error type %d at Line %d: %s\n",
                    15,
                    ID->position.first_line,
-                   "redefine the same structure type");
+                   ("redefine struct: " + id).data());
             error_happen = true;
         }
 
@@ -364,7 +364,7 @@ void ASTAnalyzer::visit_VarDec(ASTNode *node) {
             printf("Error type %d at Line %d: %s\n",
                    3,
                    ID->position.first_line,
-                   "variable is redefined in the same scope");
+                   ("redefine variable: " + id).data());
             error_happen = true;
         }
 
@@ -385,6 +385,9 @@ void ASTAnalyzer::visit_VarDec(ASTNode *node) {
         shared_ptr<Type> arrType = actual;
 
         node->attributes["declaration"] = pair<string, shared_ptr<Type>>{id, arrType};
+
+        auto &table = getSymbolTable();
+        table[id] = arrType;
 
     } else {
         throw runtime_error("error VarDec children");
@@ -412,7 +415,7 @@ void ASTAnalyzer::visit_FunDec(ASTNode *node) {
             printf("Error type %d at Line %d: %s\n",
                    4,
                    node->position.first_line,
-                   "function is redefined");
+                   ("redefine function: " + id).data());
             error_happen = true;
         }
 
@@ -440,7 +443,7 @@ void ASTAnalyzer::visit_FunDec(ASTNode *node) {
             printf("Error type %d at Line %d: %s\n",
                    4,
                    node->position.first_line,
-                   "function is redefined");
+                   ("redefine function: " + id).data());
             error_happen = true;
         }
 
@@ -571,7 +574,7 @@ void ASTAnalyzer::visit_Stmt(ASTNode *node) {
             printf("Error type %d at Line %d: %s\n",
                    8,
                    Exp->position.first_line,
-                   "the function’s return value type mismatches the declared type");
+                   "incompatiable return type");
             error_happen = true;
         }
 
@@ -970,7 +973,7 @@ void ASTAnalyzer::visit_Exp(ASTNode *node) {
             printf("Error type %d at Line %d: %s\n",
                    1,
                    ID->position.first_line,
-                   "variable is used without definition");
+                   ("undefined variable: " + id).data());
             error_happen = true;
         }
 
@@ -1047,7 +1050,7 @@ void ASTAnalyzer::visit_Exp(ASTNode *node) {
                 printf("Error type %d at Line %d: %s\n",
                        5,
                        OP->position.first_line,
-                       "unmatching types on both sides of assignment operator (=)");
+                       "unmatching type on both sides of assignment");
                 error_happen = true;
 
                 optional<shared_ptr<Type>> type = optional<shared_ptr<Type>>();
@@ -1105,7 +1108,7 @@ void ASTAnalyzer::visit_Exp(ASTNode *node) {
                 printf("Error type %d at Line %d: %s\n",
                        7,
                        Exp1->position.first_line,
-                       "unmatching operands, type cannot do arithmetic operations");
+                       "binary operation on non-number variables");
                 error_happen = true;
             }
             if (type2.value()->name != "int" && type2.value()->name != "float") {
@@ -1173,13 +1176,13 @@ void ASTAnalyzer::visit_Exp(ASTNode *node) {
                 printf("Error type %d at Line %d: %s\n",
                        11,
                        ID->position.first_line,
-                       "applying function invocation operator on non-function names");
+                       ("invoking non-function variable: " + id).data());
                 error_happen = true;
             } else {
                 printf("Error type %d at Line %d: %s\n",
                        2,
                        ID->position.first_line,
-                       "function is invoked without definition");
+                       ("undefined function: " + id).data());
                 error_happen = true;
             }
             optional<shared_ptr<Type>> type = optional<shared_ptr<Type>>();
@@ -1196,7 +1199,8 @@ void ASTAnalyzer::visit_Exp(ASTNode *node) {
             printf("Error type %d at Line %d: %s\n",
                    9,
                    ID->position.first_line,
-                   "the function’s arguments mismatch the declared parameters");
+                   ("invalid argument number for compare, expect " + std::to_string(type->parameters.size()) +
+                    ", got 0").data());
             error_happen = true;
         }
 
@@ -1208,11 +1212,19 @@ void ASTAnalyzer::visit_Exp(ASTNode *node) {
         auto id = any_cast<string>(ID->attributes.at("string_value"));
 
         if (functionTable.count(id) == 0) {
-            printf("Error type %d at Line %d: %s\n",
-                   2,
-                   ID->position.first_line,
-                   "function is invoked without definition");
-            error_happen = true;
+            if (findSymbol(id).has_value()) {
+                printf("Error type %d at Line %d: %s\n",
+                       11,
+                       ID->position.first_line,
+                       ("invoking non-function variable: " + id).data());
+                error_happen = true;
+            } else {
+                printf("Error type %d at Line %d: %s\n",
+                       2,
+                       ID->position.first_line,
+                       ("undefined function: " + id).data());
+                error_happen = true;
+            }
 
             optional<shared_ptr<Type>> type = optional<shared_ptr<Type>>();
             node->attributes["type"] = type;
@@ -1234,7 +1246,12 @@ void ASTAnalyzer::visit_Exp(ASTNode *node) {
             printf("Error type %d at Line %d: %s\n",
                    9,
                    Args->position.first_line,
-                   "the function’s arguments mismatch the declared parameters");
+                   (
+                           "invalid argument number for " + id +
+                           ", expect " + std::to_string(parameters.size()) +
+                           ", got " + std::to_string(args_type.size())
+                   ).data()
+            );
             error_happen = true;
             return;
         }
@@ -1269,7 +1286,7 @@ void ASTAnalyzer::visit_Exp(ASTNode *node) {
             printf("Error type %d at Line %d: %s\n",
                    10,
                    Exp1->position.first_line,
-                   "applying indexing operator on non-array type variables");
+                   "indexing on non-array variable");
             error_happen = true;
 
             optional<shared_ptr<Type>> type = optional<shared_ptr<Type>>();
@@ -1287,7 +1304,7 @@ void ASTAnalyzer::visit_Exp(ASTNode *node) {
             printf("Error type %d at Line %d: %s\n",
                    12,
                    Exp2->position.first_line,
-                   "array indexing with non-integer type expression");
+                   "indexing by non-integer");
             error_happen = true;
         }
 
@@ -1312,7 +1329,7 @@ void ASTAnalyzer::visit_Exp(ASTNode *node) {
             printf("Error type %d at Line %d: %s\n",
                    13,
                    Exp->position.first_line,
-                   "accessing member of non-structure variable");
+                   "accessing with non-struct variable");
             error_happen = true;
 
             optional<shared_ptr<Type>> type = optional<shared_ptr<Type>>();
@@ -1334,7 +1351,7 @@ void ASTAnalyzer::visit_Exp(ASTNode *node) {
             printf("Error type %d at Line %d: %s\n",
                    14,
                    Exp->position.first_line,
-                   "accessing an undefined structure member");
+                   ("no such member: " + id).data());
             error_happen = true;
 
             optional<shared_ptr<Type>> type = optional<shared_ptr<Type>>();
