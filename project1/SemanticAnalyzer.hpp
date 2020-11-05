@@ -2,6 +2,7 @@
 #define SEMANTIC_ANALYZER_HPP
 
 #include "ASTNode.hpp"
+#include <memory>
 
 class Type {
 public:
@@ -35,44 +36,44 @@ public:
 
 class ArrayType : public Type {
 public:
-    Type type;
+    std::shared_ptr<Type> type;
     int size;
 
-    ArrayType(Type, int);
+    ArrayType(std::shared_ptr<Type>, int);
 };
 
 class StructType : public Type {
 public:
     std::string identify;
-    std::vector<std::pair<std::string, Type *>> fields;
+    std::vector<std::pair<std::string, std::shared_ptr<Type>>> fields;
 
-    explicit StructType(const std::string &, std::vector<std::pair<std::string, Type *>>);
+    explicit StructType(const std::string &, std::vector<std::pair<std::string, std::shared_ptr<Type>>>);
 };
 
 class FunctionType : public Type {
 public:
-    Type *returns;
-    std::vector<std::pair<std::string, Type *>> parameters;
+    std::shared_ptr<Type> returns;
+    std::vector<std::pair<std::string, std::shared_ptr<Type>>> parameters;
 
-    explicit FunctionType(Type *, std::vector<std::pair<std::string, Type *>>);
+    explicit FunctionType(std::shared_ptr<Type>, std::vector<std::pair<std::string, std::shared_ptr<Type>>>);
 };
 
 class ASTAnalyzer : public ASTVisitor {
     ASTNode *root;
-    std::map<std::string, StructType *> typeTable{};
-    std::map<std::string, FunctionType *> functionTable{};
+    std::map<std::string, std::shared_ptr<StructType>> typeTable{};
+    std::map<std::string, std::shared_ptr<FunctionType>> functionTable{};
 
     std::vector<std::optional<std::string>> loopTable{};
 
-    std::vector<std::map<std::string, Type *>> symbolTableStack{};
+    std::vector<std::map<std::string, std::shared_ptr<Type>>> symbolTableStack{};
 
-    std::map<std::string, Type *> &getSymbolTable();
+    std::map<std::string, std::shared_ptr<Type>> &getSymbolTable();
 
     void pushSymbolTable();
 
     void popSymbolTable();
 
-    std::optional<Type *> findSymbol(const std::string &);
+    std::optional<std::shared_ptr<Type>> findSymbol(const std::string &);
 
 public:
     explicit ASTAnalyzer(ASTNode *);
