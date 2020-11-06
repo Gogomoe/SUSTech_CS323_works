@@ -31,7 +31,7 @@ CharType::CharType() : Type("char") {}
 StringType::StringType() : Type("string") {}
 
 ArrayType::ArrayType(
-        std::shared_ptr<Type> type_,
+        const std::shared_ptr<Type>& type_,
         int size_
 ) : Type((*type_).name + "[" + std::to_string(size_) + "]"),
     type(type_),
@@ -67,7 +67,7 @@ string joinToString(const vector<T> &list, const string &separator, const std::f
 
 
 FunctionType::FunctionType(
-        shared_ptr<Type> returns_,
+        const shared_ptr<Type> &returns_,
         vector<pair<string, shared_ptr<Type>>> parameters_
 ) : Type("(" +
          joinToString<pair<string, shared_ptr<Type>>>(
@@ -77,6 +77,11 @@ FunctionType::FunctionType(
          ")->" + returns_->name),
     returns(returns_),
     parameters(std::move(parameters_)) {}
+
+const shared_ptr<IntType> INT_TYPE = make_shared<IntType>(IntType());
+const shared_ptr<FloatType> FLOAT_TYPE = make_shared<FloatType>(FloatType());
+const shared_ptr<CharType> CHAR_TYPE = make_shared<CharType>(CharType());
+const shared_ptr<StringType> STRING_TYPE = make_shared<StringType>(StringType());
 
 map<string, shared_ptr<Type>> &ASTAnalyzer::getSymbolTable() {
     return symbolTableStack.back();
@@ -264,20 +269,16 @@ void ASTAnalyzer::visit_Specifier(ASTNode *node) {
         auto typeName = any_cast<string>(TYPE->attributes.at("string_value"));
 
         if (typeName == "int") {
-            auto actual = make_shared<IntType>(IntType());
-            shared_ptr<Type> type = actual;
+            shared_ptr<Type> type = INT_TYPE;
             node->attributes["type"] = type;
         } else if (typeName == "float") {
-            auto actual = make_shared<FloatType>(FloatType());
-            shared_ptr<Type> type = actual;
+            shared_ptr<Type> type = FLOAT_TYPE;
             node->attributes["type"] = type;
         } else if (typeName == "char") {
-            auto actual = make_shared<CharType>(CharType());
-            shared_ptr<Type> type = actual;
+            shared_ptr<Type> type = CHAR_TYPE;
             node->attributes["type"] = type;
         } else if (typeName == "string") {
-            auto actual = make_shared<StringType>(StringType());
-            shared_ptr<Type> type = actual;
+            shared_ptr<Type> type = STRING_TYPE;
             node->attributes["type"] = type;
         } else {
             throw runtime_error("error TYPE");
@@ -699,8 +700,7 @@ void ASTAnalyzer::visit_Stmt(ASTNode *node) {
 
         pushSymbolTable();
         auto &table = getSymbolTable();
-        auto actual = make_shared<IntType>(IntType());
-        table[it_name] = actual;
+        table[it_name] = INT_TYPE;
 
         loopTable.emplace_back();
         visit_CompSt(CompSt);
@@ -751,8 +751,7 @@ void ASTAnalyzer::visit_Stmt(ASTNode *node) {
 
         pushSymbolTable();
         auto &table = getSymbolTable();
-        auto actual = make_shared<IntType>(IntType());
-        table[it_name] = actual;
+        table[it_name] = INT_TYPE;
 
         loopTable.emplace_back(loop_label);
         visit_CompSt(CompSt);
@@ -980,22 +979,19 @@ void ASTAnalyzer::visit_Exp(ASTNode *node) {
     } else if (node->children.size() == 1 && node->children[0]->name == "INT") {
         // Exp: INT
 
-        auto actual = make_shared<IntType>(IntType());
-        optional<shared_ptr<Type>> type = actual;
+        optional<shared_ptr<Type>> type = INT_TYPE;
         node->attributes["type"] = type;
 
     } else if (node->children.size() == 1 && node->children[0]->name == "FLOAT") {
         // Exp: FLOAT
 
-        auto actual = make_shared<FloatType>(FloatType());
-        optional<shared_ptr<Type>> type = actual;
+        optional<shared_ptr<Type>> type = FLOAT_TYPE;
         node->attributes["type"] = type;
 
     } else if (node->children.size() == 1 && node->children[0]->name == "CHAR") {
         // Exp: CHAR
 
-        auto actual = make_shared<CharType>(CharType());
-        optional<shared_ptr<Type>> type = actual;
+        optional<shared_ptr<Type>> type = CHAR_TYPE;
         node->attributes["type"] = type;
 
     } else if (node->children.size() == 1 && node->children[0]->name == "String") {
@@ -1075,8 +1071,7 @@ void ASTAnalyzer::visit_Exp(ASTNode *node) {
                        "unmatching operands, boolean expr is not int");
                 error_happen = true;
             }
-            auto actual = make_shared<IntType>(IntType());
-            optional<shared_ptr<Type>> type = actual;
+            optional<shared_ptr<Type>> type = INT_TYPE;
             node->attributes["type"] = type;
 
         } else if (OP->name == "LT" || OP->name == "LE" || OP->name == "GT" || OP->name == "GE") {
@@ -1094,13 +1089,11 @@ void ASTAnalyzer::visit_Exp(ASTNode *node) {
                        "unmatching operands, type is not comparable");
                 error_happen = true;
             }
-            auto actual = make_shared<IntType>(IntType());
-            optional<shared_ptr<Type>> type = actual;
+            optional<shared_ptr<Type>> type = INT_TYPE;
             node->attributes["type"] = type;
 
         } else if (OP->name == "NE" || OP->name == "EQ") {
-            auto actual = make_shared<IntType>(IntType());
-            optional<shared_ptr<Type>> type = actual;
+            optional<shared_ptr<Type>> type = INT_TYPE;
             node->attributes["type"] = type;
 
         } else if (OP->name == "PLUS" || OP->name == "MINUS" || OP->name == "MUL" || OP->name == "DIV") {
@@ -1120,12 +1113,10 @@ void ASTAnalyzer::visit_Exp(ASTNode *node) {
             }
 
             if (type1.value()->name == "int" && type2.value()->name == "int") {
-                auto actual = make_shared<IntType>(IntType());
-                optional<shared_ptr<Type>> type = actual;
+                optional<shared_ptr<Type>> type = INT_TYPE;
                 node->attributes["type"] = type;
             } else {
-                auto actual = make_shared<FloatType>(FloatType());
-                optional<shared_ptr<Type>> type = actual;
+                optional<shared_ptr<Type>> type = FLOAT_TYPE;
                 node->attributes["type"] = type;
             }
         }

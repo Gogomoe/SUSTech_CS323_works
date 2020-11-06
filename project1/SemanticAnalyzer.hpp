@@ -39,7 +39,7 @@ public:
     std::shared_ptr<Type> type;
     int size;
 
-    ArrayType(std::shared_ptr<Type>, int);
+    ArrayType(const std::shared_ptr<Type>&, int);
 };
 
 class StructType : public Type {
@@ -55,7 +55,7 @@ public:
     std::shared_ptr<Type> returns;
     std::vector<std::pair<std::string, std::shared_ptr<Type>>> parameters;
 
-    explicit FunctionType(std::shared_ptr<Type>, std::vector<std::pair<std::string, std::shared_ptr<Type>>>);
+    explicit FunctionType(const std::shared_ptr<Type>&, std::vector<std::pair<std::string, std::shared_ptr<Type>>>);
 };
 
 class ASTAnalyzer : public ASTVisitor {
