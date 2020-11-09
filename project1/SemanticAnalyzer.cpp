@@ -31,7 +31,7 @@ CharType::CharType() : Type("char") {}
 StringType::StringType() : Type("string") {}
 
 ArrayType::ArrayType(
-        const std::shared_ptr<Type>& type_,
+        const std::shared_ptr<Type> &type_,
         int size_
 ) : Type((*type_).name + "[" + std::to_string(size_) + "]"),
     type(type_),
@@ -104,8 +104,21 @@ optional<shared_ptr<Type>> ASTAnalyzer::findSymbol(const string &key) {
     return {};
 }
 
+FILE *output;
 
-ASTAnalyzer::ASTAnalyzer(ASTNode *node) : root(node) {}
+ASTAnalyzer::ASTAnalyzer(ASTNode *node) : root(node) {
+    output = fopen("/dev/stdout", "w+");
+}
+
+void ASTAnalyzer::set_file(const std::string &filename) {
+    if (filename.substr(filename.length() - 4, 4) == ".spl") {
+        string output_file = filename.substr(0, filename.length() - 4) + ".out";
+        output = fopen(output_file.data(), "w+");
+    } else {
+        printf("output to stdout");
+    }
+}
+
 
 void ASTAnalyzer::analyse() {
     try {
@@ -329,10 +342,11 @@ void ASTAnalyzer::visit_StructSpecifier(ASTNode *node) {
         shared_ptr<Type> structType = actual;
 
         if (typeTable.count(id) != 0) {
-            printf("Error type %d at Line %d: %s\n",
-                   15,
-                   ID->position.first_line,
-                   ("redefine struct: " + id).data());
+            fprintf(output,
+                    "Error type %d at Line %d: %s\n",
+                    15,
+                    ID->position.first_line,
+                    ("redefine struct: " + id).data());
             error_happen = true;
         }
 
@@ -362,10 +376,11 @@ void ASTAnalyzer::visit_VarDec(ASTNode *node) {
         if (table.count(id) == 0) {
             table[id] = type;
         } else {
-            printf("Error type %d at Line %d: %s\n",
-                   3,
-                   ID->position.first_line,
-                   ("redefine variable: " + id).data());
+            fprintf(output,
+                    "Error type %d at Line %d: %s\n",
+                    3,
+                    ID->position.first_line,
+                    ("redefine variable: " + id).data());
             error_happen = true;
         }
 
@@ -413,10 +428,11 @@ void ASTAnalyzer::visit_FunDec(ASTNode *node) {
         if (functionTable.count(id) == 0) {
             functionTable[id] = dynamic_pointer_cast<FunctionType>(type);
         } else {
-            printf("Error type %d at Line %d: %s\n",
-                   4,
-                   node->position.first_line,
-                   ("redefine function: " + id).data());
+            fprintf(output,
+                    "Error type %d at Line %d: %s\n",
+                    4,
+                    node->position.first_line,
+                    ("redefine function: " + id).data());
             error_happen = true;
         }
 
@@ -441,10 +457,11 @@ void ASTAnalyzer::visit_FunDec(ASTNode *node) {
         if (functionTable.count(id) == 0) {
             functionTable[id] = dynamic_pointer_cast<FunctionType>(type);
         } else {
-            printf("Error type %d at Line %d: %s\n",
-                   4,
-                   node->position.first_line,
-                   ("redefine function: " + id).data());
+            fprintf(output,
+                    "Error type %d at Line %d: %s\n",
+                    4,
+                    node->position.first_line,
+                    ("redefine function: " + id).data());
             error_happen = true;
         }
 
@@ -572,10 +589,11 @@ void ASTAnalyzer::visit_Stmt(ASTNode *node) {
         auto return_type = any_cast<shared_ptr<Type>>(node->attributes.at("return_type"));
 
         if (type.has_value() && type.value()->name != return_type->name) {
-            printf("Error type %d at Line %d: %s\n",
-                   8,
-                   Exp->position.first_line,
-                   "incompatiable return type");
+            fprintf(output,
+                    "Error type %d at Line %d: %s\n",
+                    8,
+                    Exp->position.first_line,
+                    "incompatiable return type");
             error_happen = true;
         }
 
@@ -588,10 +606,11 @@ void ASTAnalyzer::visit_Stmt(ASTNode *node) {
 
         auto type = any_cast<optional<shared_ptr<Type>>>(Exp->attributes.at("type"));
         if (type.has_value() && type.value()->name != "int") {
-            printf("Error type %d at Line %d: %s\n",
-                   7,
-                   Exp->position.first_line,
-                   "unmatching operands, condition is not int");
+            fprintf(output,
+                    "Error type %d at Line %d: %s\n",
+                    7,
+                    Exp->position.first_line,
+                    "unmatching operands, condition is not int");
             error_happen = true;
         }
 
@@ -607,10 +626,11 @@ void ASTAnalyzer::visit_Stmt(ASTNode *node) {
 
         auto type = any_cast<optional<shared_ptr<Type>>>(Exp->attributes.at("type"));
         if (type.has_value() && type.value()->name != "int") {
-            printf("Error type %d at Line %d: %s\n",
-                   7,
-                   Exp->position.first_line,
-                   "unmatching operands, condition is not int");
+            fprintf(output,
+                    "Error type %d at Line %d: %s\n",
+                    7,
+                    Exp->position.first_line,
+                    "unmatching operands, condition is not int");
             error_happen = true;
         }
 
@@ -626,10 +646,11 @@ void ASTAnalyzer::visit_Stmt(ASTNode *node) {
 
         auto type = any_cast<optional<shared_ptr<Type>>>(Exp->attributes.at("type"));
         if (type.has_value() && type.value()->name != "int") {
-            printf("Error type %d at Line %d: %s\n",
-                   7,
-                   Exp->position.first_line,
-                   "unmatching operands, condition is not int");
+            fprintf(output,
+                    "Error type %d at Line %d: %s\n",
+                    7,
+                    Exp->position.first_line,
+                    "unmatching operands, condition is not int");
             error_happen = true;
         }
 
@@ -646,10 +667,11 @@ void ASTAnalyzer::visit_Stmt(ASTNode *node) {
         auto loop_label = any_cast<string>(ID->attributes.at("string_value"));
         for (auto it = loopTable.rbegin(); it != loopTable.rend(); it++) {
             if ((*it).has_value() && (*it).value() == loop_label) {
-                printf("Error type %d at Line %d: %s\n",
-                       -1,
-                       ID->position.first_line,
-                       "redefined loop label");
+                fprintf(output,
+                        "Error type %d at Line %d: %s\n",
+                        -1,
+                        ID->position.first_line,
+                        "redefined loop label");
                 error_happen = true;
             }
         }
@@ -658,10 +680,11 @@ void ASTAnalyzer::visit_Stmt(ASTNode *node) {
 
         auto type = any_cast<optional<shared_ptr<Type>>>(Exp->attributes.at("type"));
         if (type.has_value() && type.value()->name != "int") {
-            printf("Error type %d at Line %d: %s\n",
-                   7,
-                   Exp->position.first_line,
-                   "unmatching operands, condition is not int");
+            fprintf(output,
+                    "Error type %d at Line %d: %s\n",
+                    7,
+                    Exp->position.first_line,
+                    "unmatching operands, condition is not int");
             error_happen = true;
         }
 
@@ -683,18 +706,20 @@ void ASTAnalyzer::visit_Stmt(ASTNode *node) {
 
         auto type1 = any_cast<optional<shared_ptr<Type>>>(Exp1->attributes.at("type"));
         if (type1.has_value() && type1.value()->name != "int") {
-            printf("Error type %d at Line %d: %s\n",
-                   7,
-                   Exp1->position.first_line,
-                   "unmatching operands, for loop range is not int");
+            fprintf(output,
+                    "Error type %d at Line %d: %s\n",
+                    7,
+                    Exp1->position.first_line,
+                    "unmatching operands, for loop range is not int");
             error_happen = true;
         }
         auto type2 = any_cast<optional<shared_ptr<Type>>>(Exp2->attributes.at("type"));
         if (type2.has_value() && type2.value()->name != "int") {
-            printf("Error type %d at Line %d: %s\n",
-                   7,
-                   Exp2->position.first_line,
-                   "unmatching operands, for loop range is not int");
+            fprintf(output,
+                    "Error type %d at Line %d: %s\n",
+                    7,
+                    Exp2->position.first_line,
+                    "unmatching operands, for loop range is not int");
             error_happen = true;
         }
 
@@ -719,10 +744,11 @@ void ASTAnalyzer::visit_Stmt(ASTNode *node) {
         auto loop_label = any_cast<string>(ID0->attributes.at("string_value"));
         for (auto it = loopTable.rbegin(); it != loopTable.rend(); it++) {
             if ((*it).has_value() && (*it).value() == loop_label) {
-                printf("Error type %d at Line %d: %s\n",
-                       -1,
-                       ID0->position.first_line,
-                       "redefined loop label");
+                fprintf(output,
+                        "Error type %d at Line %d: %s\n",
+                        -1,
+                        ID0->position.first_line,
+                        "redefined loop label");
                 error_happen = true;
             }
         }
@@ -734,18 +760,20 @@ void ASTAnalyzer::visit_Stmt(ASTNode *node) {
 
         auto type1 = any_cast<optional<shared_ptr<Type>>>(Exp1->attributes.at("type"));
         if (type1.has_value() && type1.value()->name != "int") {
-            printf("Error type %d at Line %d: %s\n",
-                   7,
-                   Exp1->position.first_line,
-                   "unmatching operands, for loop range is not int");
+            fprintf(output,
+                    "Error type %d at Line %d: %s\n",
+                    7,
+                    Exp1->position.first_line,
+                    "unmatching operands, for loop range is not int");
             error_happen = true;
         }
         auto type2 = any_cast<optional<shared_ptr<Type>>>(Exp2->attributes.at("type"));
         if (type2.has_value() && type2.value()->name != "int") {
-            printf("Error type %d at Line %d: %s\n",
-                   7,
-                   Exp2->position.first_line,
-                   "unmatching operands, for loop range is not int");
+            fprintf(output,
+                    "Error type %d at Line %d: %s\n",
+                    7,
+                    Exp2->position.first_line,
+                    "unmatching operands, for loop range is not int");
             error_happen = true;
         }
 
@@ -764,10 +792,11 @@ void ASTAnalyzer::visit_Stmt(ASTNode *node) {
 
 
         if (loopTable.empty()) {
-            printf("Error type %d at Line %d: %s\n",
-                   -1,
-                   node->position.first_line,
-                   "cannot break outside loop");
+            fprintf(output,
+                    "Error type %d at Line %d: %s\n",
+                    -1,
+                    node->position.first_line,
+                    "cannot break outside loop");
             error_happen = true;
         }
 
@@ -784,10 +813,11 @@ void ASTAnalyzer::visit_Stmt(ASTNode *node) {
             }
         }
         if (!find_label) {
-            printf("Error type %d at Line %d: %s\n",
-                   -1,
-                   ID->position.first_line,
-                   "cannot break without label");
+            fprintf(output,
+                    "Error type %d at Line %d: %s\n",
+                    -1,
+                    ID->position.first_line,
+                    "cannot break without label");
             error_happen = true;
         }
 
@@ -796,10 +826,11 @@ void ASTAnalyzer::visit_Stmt(ASTNode *node) {
 
 
         if (loopTable.empty()) {
-            printf("Error type %d at Line %d: %s\n",
-                   -1,
-                   node->position.first_line,
-                   "cannot continue outside loop");
+            fprintf(output,
+                    "Error type %d at Line %d: %s\n",
+                    -1,
+                    node->position.first_line,
+                    "cannot continue outside loop");
             error_happen = true;
         }
 
@@ -816,10 +847,11 @@ void ASTAnalyzer::visit_Stmt(ASTNode *node) {
             }
         }
         if (!find_label) {
-            printf("Error type %d at Line %d: %s\n",
-                   -1,
-                   ID->position.first_line,
-                   "cannot continue without label");
+            fprintf(output,
+                    "Error type %d at Line %d: %s\n",
+                    -1,
+                    ID->position.first_line,
+                    "cannot continue without label");
             error_happen = true;
         }
     } else {
@@ -941,10 +973,11 @@ void ASTAnalyzer::visit_Dec(ASTNode *node) {
         auto require_type = any_cast<shared_ptr<Type>>(node->attributes.at("type"));
 
         if (type.has_value() && type.value()->name != require_type->name) {
-            printf("Error type %d at Line %d: %s\n",
-                   5,
-                   Exp->position.first_line,
-                   "unmatching types on both sides of assignment operator");
+            fprintf(output,
+                    "Error type %d at Line %d: %s\n",
+                    5,
+                    Exp->position.first_line,
+                    "unmatching types on both sides of assignment operator");
             error_happen = true;
         }
 
@@ -969,10 +1002,11 @@ void ASTAnalyzer::visit_Exp(ASTNode *node) {
         node->attributes["lvalue"] = true;
 
         if (!type.has_value()) {
-            printf("Error type %d at Line %d: %s\n",
-                   1,
-                   ID->position.first_line,
-                   ("undefined variable: " + id).data());
+            fprintf(output,
+                    "Error type %d at Line %d: %s\n",
+                    1,
+                    ID->position.first_line,
+                    ("undefined variable: " + id).data());
             error_happen = true;
         }
 
@@ -1031,10 +1065,11 @@ void ASTAnalyzer::visit_Exp(ASTNode *node) {
         if (OP->name == "ASSIGN") {
             auto lvalue = any_cast<bool>(Exp1->attributes.at("lvalue"));
             if (!lvalue) {
-                printf("Error type %d at Line %d: %s\n",
-                       6,
-                       OP->position.first_line,
-                       "rvalue on the left side of assignment operator");
+                fprintf(output,
+                        "Error type %d at Line %d: %s\n",
+                        6,
+                        OP->position.first_line,
+                        "left side in assignment is rvalue");
                 error_happen = true;
 
                 optional<shared_ptr<Type>> type = optional<shared_ptr<Type>>();
@@ -1043,10 +1078,11 @@ void ASTAnalyzer::visit_Exp(ASTNode *node) {
             }
 
             if (type1.value()->name != type2.value()->name) {
-                printf("Error type %d at Line %d: %s\n",
-                       5,
-                       OP->position.first_line,
-                       "unmatching type on both sides of assignment");
+                fprintf(output,
+                        "Error type %d at Line %d: %s\n",
+                        5,
+                        OP->position.first_line,
+                        "unmatching type on both sides of assignment");
                 error_happen = true;
 
                 optional<shared_ptr<Type>> type = optional<shared_ptr<Type>>();
@@ -1058,17 +1094,19 @@ void ASTAnalyzer::visit_Exp(ASTNode *node) {
 
         } else if (OP->name == "AND" || OP->name == "OR") {
             if (type1.value()->name != "int") {
-                printf("Error type %d at Line %d: %s\n",
-                       7,
-                       Exp1->position.first_line,
-                       "unmatching operands, boolean expr is not int");
+                fprintf(output,
+                        "Error type %d at Line %d: %s\n",
+                        7,
+                        Exp1->position.first_line,
+                        "unmatching operands, boolean expr is not int");
                 error_happen = true;
             }
             if (type2.value()->name != "int") {
-                printf("Error type %d at Line %d: %s\n",
-                       7,
-                       Exp2->position.first_line,
-                       "unmatching operands, boolean expr is not int");
+                fprintf(output,
+                        "Error type %d at Line %d: %s\n",
+                        7,
+                        Exp2->position.first_line,
+                        "unmatching operands, boolean expr is not int");
                 error_happen = true;
             }
             optional<shared_ptr<Type>> type = INT_TYPE;
@@ -1076,17 +1114,19 @@ void ASTAnalyzer::visit_Exp(ASTNode *node) {
 
         } else if (OP->name == "LT" || OP->name == "LE" || OP->name == "GT" || OP->name == "GE") {
             if (type1.value()->name != "int" && type1.value()->name != "float") {
-                printf("Error type %d at Line %d: %s\n",
-                       7,
-                       Exp1->position.first_line,
-                       "unmatching operands, type is not comparable");
+                fprintf(output,
+                        "Error type %d at Line %d: %s\n",
+                        7,
+                        Exp1->position.first_line,
+                        "unmatching operands, type is not comparable");
                 error_happen = true;
             }
             if (type2.value()->name != "int" && type2.value()->name != "float") {
-                printf("Error type %d at Line %d: %s\n",
-                       7,
-                       Exp2->position.first_line,
-                       "unmatching operands, type is not comparable");
+                fprintf(output,
+                        "Error type %d at Line %d: %s\n",
+                        7,
+                        Exp2->position.first_line,
+                        "unmatching operands, type is not comparable");
                 error_happen = true;
             }
             optional<shared_ptr<Type>> type = INT_TYPE;
@@ -1098,17 +1138,19 @@ void ASTAnalyzer::visit_Exp(ASTNode *node) {
 
         } else if (OP->name == "PLUS" || OP->name == "MINUS" || OP->name == "MUL" || OP->name == "DIV") {
             if (type1.value()->name != "int" && type1.value()->name != "float") {
-                printf("Error type %d at Line %d: %s\n",
-                       7,
-                       Exp1->position.first_line,
-                       "binary operation on non-number variables");
+                fprintf(output,
+                        "Error type %d at Line %d: %s\n",
+                        7,
+                        Exp1->position.first_line,
+                        "binary operation on non-number variables");
                 error_happen = true;
             }
             if (type2.value()->name != "int" && type2.value()->name != "float") {
-                printf("Error type %d at Line %d: %s\n",
-                       7,
-                       Exp2->position.first_line,
-                       "unmatching operands, type cannot do arithmetic operations");
+                fprintf(output,
+                        "Error type %d at Line %d: %s\n",
+                        7,
+                        Exp2->position.first_line,
+                        "unmatching operands, type cannot do arithmetic operations");
                 error_happen = true;
             }
 
@@ -1141,18 +1183,20 @@ void ASTAnalyzer::visit_Exp(ASTNode *node) {
 
         if (OP->name == "MINUS") {
             if (type.has_value() && type.value()->name != "int" && type.value()->name != "float") {
-                printf("Error type %d at Line %d: %s\n",
-                       7,
-                       Exp->position.first_line,
-                       "unmatching operands, type cannot do arithmetic operations");
+                fprintf(output,
+                        "Error type %d at Line %d: %s\n",
+                        7,
+                        Exp->position.first_line,
+                        "unmatching operands, type cannot do arithmetic operations");
                 error_happen = true;
             }
         } else if (OP->name == "NOT") {
             if (type.has_value() && type.value()->name != "int") {
-                printf("Error type %d at Line %d: %s\n",
-                       7,
-                       Exp->position.first_line,
-                       "unmatching operands, boolean expr is not int");
+                fprintf(output,
+                        "Error type %d at Line %d: %s\n",
+                        7,
+                        Exp->position.first_line,
+                        "unmatching operands, boolean expr is not int");
                 error_happen = true;
             }
         }
@@ -1164,16 +1208,18 @@ void ASTAnalyzer::visit_Exp(ASTNode *node) {
 
         if (functionTable.count(id) == 0) {
             if (findSymbol(id).has_value()) {
-                printf("Error type %d at Line %d: %s\n",
-                       11,
-                       ID->position.first_line,
-                       ("invoking non-function variable: " + id).data());
+                fprintf(output,
+                        "Error type %d at Line %d: %s\n",
+                        11,
+                        ID->position.first_line,
+                        ("invoking non-function variable: " + id).data());
                 error_happen = true;
             } else {
-                printf("Error type %d at Line %d: %s\n",
-                       2,
-                       ID->position.first_line,
-                       ("undefined function: " + id).data());
+                fprintf(output,
+                        "Error type %d at Line %d: %s\n",
+                        2,
+                        ID->position.first_line,
+                        ("undefined function: " + id).data());
                 error_happen = true;
             }
             optional<shared_ptr<Type>> type = optional<shared_ptr<Type>>();
@@ -1187,11 +1233,12 @@ void ASTAnalyzer::visit_Exp(ASTNode *node) {
         node->attributes["type"] = return_type;
 
         if (!type->parameters.empty()) {
-            printf("Error type %d at Line %d: %s\n",
-                   9,
-                   ID->position.first_line,
-                   ("invalid argument number for compare, expect " + std::to_string(type->parameters.size()) +
-                    ", got 0").data());
+            fprintf(output,
+                    "Error type %d at Line %d: %s\n",
+                    9,
+                    ID->position.first_line,
+                    ("invalid argument number for compare, expect " + std::to_string(type->parameters.size()) +
+                     ", got 0").data());
             error_happen = true;
         }
 
@@ -1204,16 +1251,18 @@ void ASTAnalyzer::visit_Exp(ASTNode *node) {
 
         if (functionTable.count(id) == 0) {
             if (findSymbol(id).has_value()) {
-                printf("Error type %d at Line %d: %s\n",
-                       11,
-                       ID->position.first_line,
-                       ("invoking non-function variable: " + id).data());
+                fprintf(output,
+                        "Error type %d at Line %d: %s\n",
+                        11,
+                        ID->position.first_line,
+                        ("invoking non-function variable: " + id).data());
                 error_happen = true;
             } else {
-                printf("Error type %d at Line %d: %s\n",
-                       2,
-                       ID->position.first_line,
-                       ("undefined function: " + id).data());
+                fprintf(output,
+                        "Error type %d at Line %d: %s\n",
+                        2,
+                        ID->position.first_line,
+                        ("undefined function: " + id).data());
                 error_happen = true;
             }
 
@@ -1234,14 +1283,15 @@ void ASTAnalyzer::visit_Exp(ASTNode *node) {
         auto &parameters = type->parameters;
 
         if (args_type.size() != parameters.size()) {
-            printf("Error type %d at Line %d: %s\n",
-                   9,
-                   Args->position.first_line,
-                   (
-                           "invalid argument number for " + id +
-                           ", expect " + std::to_string(parameters.size()) +
-                           ", got " + std::to_string(args_type.size())
-                   ).data()
+            fprintf(output,
+                    "Error type %d at Line %d: %s\n",
+                    9,
+                    Args->position.first_line,
+                    (
+                            "invalid argument number for " + id +
+                            ", expect " + std::to_string(parameters.size()) +
+                            ", got " + std::to_string(args_type.size())
+                    ).data()
             );
             error_happen = true;
             return;
@@ -1249,10 +1299,11 @@ void ASTAnalyzer::visit_Exp(ASTNode *node) {
 
         for (int i = 0; i < parameters.size(); i++) {
             if (args_type[i].has_value() && args_type[i].value()->name != parameters[i].second->name) {
-                printf("Error type %d at Line %d: %s\n",
-                       9,
-                       Args->position.first_line,
-                       "the function’s arguments mismatch the declared parameters");
+                fprintf(output,
+                        "Error type %d at Line %d: %s\n",
+                        9,
+                        Args->position.first_line,
+                        "the function’s arguments mismatch the declared parameters");
                 error_happen = true;
                 return;
             }
@@ -1274,10 +1325,11 @@ void ASTAnalyzer::visit_Exp(ASTNode *node) {
         }
 
         if (dynamic_pointer_cast<ArrayType>(type1.value()) == nullptr) {
-            printf("Error type %d at Line %d: %s\n",
-                   10,
-                   Exp1->position.first_line,
-                   "indexing on non-array variable");
+            fprintf(output,
+                    "Error type %d at Line %d: %s\n",
+                    10,
+                    Exp1->position.first_line,
+                    "indexing on non-array variable");
             error_happen = true;
 
             optional<shared_ptr<Type>> type = optional<shared_ptr<Type>>();
@@ -1292,10 +1344,11 @@ void ASTAnalyzer::visit_Exp(ASTNode *node) {
         auto type2 = any_cast<optional<shared_ptr<Type>>>(Exp2->attributes.at("type"));
 
         if (type2.has_value() && type2.value()->name != "int") {
-            printf("Error type %d at Line %d: %s\n",
-                   12,
-                   Exp2->position.first_line,
-                   "indexing by non-integer");
+            fprintf(output,
+                    "Error type %d at Line %d: %s\n",
+                    12,
+                    Exp2->position.first_line,
+                    "indexing by non-integer");
             error_happen = true;
         }
 
@@ -1317,10 +1370,11 @@ void ASTAnalyzer::visit_Exp(ASTNode *node) {
         }
 
         if (dynamic_pointer_cast<StructType>(exp_type.value()) == nullptr) {
-            printf("Error type %d at Line %d: %s\n",
-                   13,
-                   Exp->position.first_line,
-                   "accessing with non-struct variable");
+            fprintf(output,
+                    "Error type %d at Line %d: %s\n",
+                    13,
+                    Exp->position.first_line,
+                    "accessing with non-struct variable");
             error_happen = true;
 
             optional<shared_ptr<Type>> type = optional<shared_ptr<Type>>();
@@ -1339,10 +1393,11 @@ void ASTAnalyzer::visit_Exp(ASTNode *node) {
         }
 
         if (find_member == nullptr) {
-            printf("Error type %d at Line %d: %s\n",
-                   14,
-                   Exp->position.first_line,
-                   ("no such member: " + id).data());
+            fprintf(output,
+                    "Error type %d at Line %d: %s\n",
+                    14,
+                    Exp->position.first_line,
+                    ("no such member: " + id).data());
             error_happen = true;
 
             optional<shared_ptr<Type>> type = optional<shared_ptr<Type>>();

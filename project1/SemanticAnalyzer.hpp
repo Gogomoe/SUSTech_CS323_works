@@ -39,7 +39,7 @@ public:
     std::shared_ptr<Type> type;
     int size;
 
-    ArrayType(const std::shared_ptr<Type>&, int);
+    ArrayType(const std::shared_ptr<Type> &, int);
 };
 
 class StructType : public Type {
@@ -55,7 +55,7 @@ public:
     std::shared_ptr<Type> returns;
     std::vector<std::pair<std::string, std::shared_ptr<Type>>> parameters;
 
-    explicit FunctionType(const std::shared_ptr<Type>&, std::vector<std::pair<std::string, std::shared_ptr<Type>>>);
+    explicit FunctionType(const std::shared_ptr<Type> &, std::vector<std::pair<std::string, std::shared_ptr<Type>>>);
 };
 
 class ASTAnalyzer : public ASTVisitor {
@@ -75,8 +75,11 @@ class ASTAnalyzer : public ASTVisitor {
 
     std::optional<std::shared_ptr<Type>> findSymbol(const std::string &);
 
+
 public:
     explicit ASTAnalyzer(ASTNode *);
+
+    static void set_file(const std::string&);
 
     void analyse();
 

@@ -231,6 +231,8 @@ int main(int argc, char **argv){
         int error = yyparse();
         if (!error && !error_happen) {
             ASTAnalyzer analyzer(program);
+            analyzer.set_file(file_path);
+
             analyzer.analyse();
 
             if (!error_happen) {
