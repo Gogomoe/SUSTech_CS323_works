@@ -1,0 +1,31 @@
+struct st {
+    int x;
+};
+
+int foo() {
+
+    int a, b;
+    float c, d;
+    struct st e;
+    int f[20];
+
+    if (a && c) {}
+
+    if (5.6) {}
+
+    e + 1;
+
+    if (f < 100) {}
+
+}
+
+int bar() {
+
+    int g[10];
+
+    if (1) {
+        return g;
+    }
+
+    return 12.3;
+}

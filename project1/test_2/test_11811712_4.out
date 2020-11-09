@@ -1,0 +1,6 @@
+Error type 7 at Line 12: unmatching operands, boolean expr is not int
+Error type 7 at Line 14: unmatching operands, condition is not int
+Error type 7 at Line 16: binary operation on non-number variables
+Error type 7 at Line 18: unmatching operands, type is not comparable
+Error type 8 at Line 27: incompatiable return type
+Error type 8 at Line 30: incompatiable return type

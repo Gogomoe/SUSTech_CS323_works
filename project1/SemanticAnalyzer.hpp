@@ -10,7 +10,7 @@ public:
 
     explicit Type(std::string);
 
-    virtual std::string getName();
+    virtual bool type_equals(std::shared_ptr<Type> type);
 };
 
 class IntType : public Type {
@@ -40,6 +40,8 @@ public:
     int size;
 
     ArrayType(const std::shared_ptr<Type> &, int);
+
+    bool type_equals(std::shared_ptr<Type>) override;
 };
 
 class StructType : public Type {
@@ -48,6 +50,8 @@ public:
     std::vector<std::pair<std::string, std::shared_ptr<Type>>> fields;
 
     explicit StructType(const std::string &, std::vector<std::pair<std::string, std::shared_ptr<Type>>>);
+
+    bool type_equals(std::shared_ptr<Type>) override;
 };
 
 class FunctionType : public Type {
@@ -79,7 +83,7 @@ class ASTAnalyzer : public ASTVisitor {
 public:
     explicit ASTAnalyzer(ASTNode *);
 
-    static void set_file(const std::string&);
+    static void set_file(const std::string &);
 
     void analyse();
 
@@ -90,41 +94,41 @@ public:
 //    void visit_Program(ASTNode *);
 //    void visit_ImportList(ASTNode *);
 //    void visit_ImportStmt(ASTNode *);
-    void visit_ExtDefList(ASTNode *);
+    void visit_ExtDefList(ASTNode *) override;
 
-    void visit_ExtDef(ASTNode *);
+    void visit_ExtDef(ASTNode *) override;
 
-    void visit_ExtDecList(ASTNode *);
+    void visit_ExtDecList(ASTNode *) override;
 
-    void visit_Specifier(ASTNode *);
+    void visit_Specifier(ASTNode *) override;
 
-    void visit_StructSpecifier(ASTNode *);
+    void visit_StructSpecifier(ASTNode *) override;
 
-    void visit_VarDec(ASTNode *);
+    void visit_VarDec(ASTNode *) override;
 
-    void visit_FunDec(ASTNode *);
+    void visit_FunDec(ASTNode *) override;
 
-    void visit_VarList(ASTNode *);
+    void visit_VarList(ASTNode *) override;
 
-    void visit_ParamDec(ASTNode *);
+    void visit_ParamDec(ASTNode *) override;
 
-    void visit_CompSt(ASTNode *);
+    void visit_CompSt(ASTNode *) override;
 
-    void visit_StmtList(ASTNode *);
+    void visit_StmtList(ASTNode *) override;
 
-    void visit_Stmt(ASTNode *);
+    void visit_Stmt(ASTNode *) override;
 
-    void visit_DefList(ASTNode *);
+    void visit_DefList(ASTNode *) override;
 
-    void visit_Def(ASTNode *);
+    void visit_Def(ASTNode *) override;
 
-    void visit_DecList(ASTNode *);
+    void visit_DecList(ASTNode *) override;
 
-    void visit_Dec(ASTNode *);
+    void visit_Dec(ASTNode *) override;
 
-    void visit_Exp(ASTNode *);
+    void visit_Exp(ASTNode *) override;
 
-    void visit_Args(ASTNode *);
+    void visit_Args(ASTNode *) override;
 
 //    void visit_String(ASTNode *);
 //    void visit_StringInternalList(ASTNode *);

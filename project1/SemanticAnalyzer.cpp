@@ -18,8 +18,8 @@ using std::runtime_error;
 
 Type::Type(string name_) : name(std::move(name_)) {}
 
-string Type::getName() {
-    return name;
+bool Type::type_equals(std::shared_ptr<Type> type) {
+    return this->name == type->name;
 }
 
 IntType::IntType() : Type("int") {}
@@ -37,6 +37,14 @@ ArrayType::ArrayType(
     type(type_),
     size(size_) {}
 
+bool ArrayType::type_equals(std::shared_ptr<Type> other) {
+    shared_ptr<ArrayType> other_type = dynamic_pointer_cast<ArrayType>(other);
+    if (other_type == nullptr) {
+        return false;
+    }
+    return this->type->type_equals(other_type->type) && this->size == other_type->size;
+}
+
 
 StructType::StructType(
         const string &identify_,
@@ -44,6 +52,23 @@ StructType::StructType(
 ) : Type(identify_),
     identify(identify_),
     fields(std::move(fields_)) {}
+
+bool StructType::type_equals(std::shared_ptr<Type> other) {
+    shared_ptr<StructType> other_type = dynamic_pointer_cast<StructType>(other);
+    if (other_type == nullptr) {
+        return false;
+    }
+    if (this->fields.size() != other_type->fields.size()) {
+        return false;
+    }
+    for (int i = 0; i < this->fields.size(); i++) {
+        if (!this->fields[i].second->type_equals(other_type->fields[i].second)) {
+            return false;
+        }
+    }
+    return true;
+}
+
 
 template<class T>
 string joinToString(const vector<T> &list, const string &separator, const std::function<string(T const &)> &transform) {
@@ -977,7 +1002,7 @@ void ASTAnalyzer::visit_Dec(ASTNode *node) {
                     "Error type %d at Line %d: %s\n",
                     5,
                     Exp->position.first_line,
-                    "unmatching types on both sides of assignment operator");
+                    "unmatching type on both sides of assignment");
             error_happen = true;
         }
 
@@ -1031,7 +1056,8 @@ void ASTAnalyzer::visit_Exp(ASTNode *node) {
     } else if (node->children.size() == 1 && node->children[0]->name == "String") {
         // Exp: String
 
-        // TODO
+        optional<shared_ptr<Type>> type = STRING_TYPE;
+        node->attributes["type"] = type;
     } else if (node->children.size() == 3 && node->children[0]->name == "Exp" && node->children[2]->name == "Exp") {
         // Exp: Exp ASSIGN Exp
         // Exp: Exp AND Exp

@@ -1,0 +1,15 @@
+struct st {
+    int x;
+    float y;
+};
+
+int foo() {
+    struct st c;
+
+    c.z;
+}
+
+struct st {
+    int x;
+    float y;
+};

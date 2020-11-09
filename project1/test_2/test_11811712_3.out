@@ -1,0 +1,7 @@
+Error type 5 at Line 3: unmatching type on both sides of assignment
+Error type 5 at Line 8: unmatching type on both sides of assignment
+Error type 5 at Line 9: unmatching type on both sides of assignment
+Error type 5 at Line 10: unmatching type on both sides of assignment
+Error type 6 at Line 16: left side in assignment is rvalue
+Error type 6 at Line 18: left side in assignment is rvalue
+Error type 6 at Line 20: left side in assignment is rvalue

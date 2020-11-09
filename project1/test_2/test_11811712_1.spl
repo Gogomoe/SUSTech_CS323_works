@@ -1,0 +1,15 @@
+int foo() {
+    int b;
+
+    b = a + 10;
+}
+
+int a;
+
+int bar() {
+    int c;
+
+    c = a + 10;
+
+    baz();
+}

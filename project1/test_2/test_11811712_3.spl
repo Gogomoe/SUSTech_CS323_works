@@ -1,0 +1,23 @@
+int foo() {
+
+    int a = 12.3;
+    int b;
+    float c;
+    int d[10];
+
+    b = 'x';
+    c = d;
+    d = 10;
+
+}
+
+int bar() {
+
+    1 + 2 = 3;
+
+    foo() = 5;
+
+    1 < 2 = 0;
+
+}
+

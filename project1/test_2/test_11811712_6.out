@@ -1,0 +1,2 @@
+Error type 10 at Line 4: indexing on non-array variable
+Error type 11 at Line 6: invoking non-function variable: b

@@ -1,0 +1,13 @@
+struct st {
+    int x;
+    float y;
+};
+
+int foo() {
+    int a[10];
+    struct st c;
+
+    a[c.y];
+
+    c.x.y;
+}

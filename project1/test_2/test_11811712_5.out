@@ -1,0 +1,3 @@
+Error type 9 at Line 7: invalid argument number for compare, expect 2, got 0
+Error type 9 at Line 9: invalid argument number for foo, expect 2, got 1
+Error type 9 at Line 11: the function’s arguments mismatch the declared parameters

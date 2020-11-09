@@ -1,0 +1,5 @@
+Error type 3 at Line 4: redefine variable: a
+Error type 3 at Line 5: redefine variable: b
+Error type 4 at Line 9: redefine function: foo
+Error type 3 at Line 12: redefine variable: c
+Error type 3 at Line 13: redefine variable: d
