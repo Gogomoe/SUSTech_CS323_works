@@ -991,12 +991,12 @@ void ASTAnalyzer::visit_Dec(ASTNode *node) {
         auto type = any_cast<optional<shared_ptr<Type>>>(Exp->attributes.at("type"));
         auto require_type = any_cast<shared_ptr<Type>>(node->attributes.at("type"));
 
-        if (type.has_value() && type.value()->name != require_type->name) {
+        if (type.has_value() && !type.value()->type_equals(require_type)) {
             fprintf(output,
                     "Error type %d at Line %d: %s\n",
                     5,
                     Exp->position.first_line,
-                    "unmatching type on both sides of assignment");
+                    "unmatching type on return");
             error_happen = true;
         }
 
@@ -1097,7 +1097,7 @@ void ASTAnalyzer::visit_Exp(ASTNode *node) {
                 return;
             }
 
-            if (type1.value()->name != type2.value()->name) {
+            if (!type1.value()->type_equals(type2.value())) {
                 fprintf(output,
                         "Error type %d at Line %d: %s\n",
                         5,
