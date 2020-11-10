@@ -151,18 +151,12 @@ void ASTAnalyzer::analyse() {
         visit_node(this->root);
         popSymbolTable();
     } catch (runtime_error &error) {
-        backtrace_symbols_fd(last_frames, last_size, 2);
-
         printf("%s\n", error.what());
         error_happen = true;
     } catch (std::out_of_range &error) {
-        backtrace_symbols_fd(last_frames, last_size, 2);
-
         printf("%s\n", error.what());
         error_happen = true;
     } catch (std::bad_any_cast &error) {
-        backtrace_symbols_fd(last_frames, last_size, 2);
-
         printf("%s\n", error.what());
         error_happen = true;
     }
