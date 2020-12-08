@@ -21,9 +21,13 @@ std::string IntermediateCode::createSymbol(const std::string &symbol) {
     if (symbolTable.find(symbol) != symbolTable.end()) {
         throw runtime_error("symbol " + symbol + " already exist");
     }
-    string name = "v" + std::to_string(variable_count);
-    variable_count++;
+//    string name = "v" + std::to_string(variable_count);
+//    variable_count++;
+//    symbolTable[symbol] = name;
+
+    string name = symbol;
     symbolTable[symbol] = name;
+
     return name;
 }
 
@@ -706,6 +710,9 @@ void IntermediateCode::visit_Stmt(ASTNode *node) {
 void IntermediateCode::visit_DefList(ASTNode *node) {
     if (node->children.empty()) {
         // DefList: %empty
+
+        node->attributes["ircode"] = make_shared<Code>(Code(""));
+
     } else if (node->children.size() == 2) {
         // DefList: Def DefList
         ASTNode *Def = node->children[0];
@@ -899,9 +906,9 @@ void IntermediateCode::visit_Exp(ASTNode *node) {
                     make_shared<Code>(Code("IF " + place2 + " == #0 GOTO " + label_false)),
                     make_shared<Code>(Code(target + " := #1")),
                     make_shared<Code>(Code("GOTO " + label_end)),
-                    make_shared<Code>(Code("LABEL " + label_false)),
+                    make_shared<Code>(Code("LABEL " + label_false + " :")),
                     make_shared<Code>(Code(target + " := #0")),
-                    make_shared<Code>(Code("LABEL " + label_end)),
+                    make_shared<Code>(Code("LABEL " + label_end + " :")),
             };
 
             auto code = make_shared<Code>(Code(codes));
@@ -919,9 +926,9 @@ void IntermediateCode::visit_Exp(ASTNode *node) {
                     make_shared<Code>(Code("IF " + place2 + " != #0 GOTO " + label_true)),
                     make_shared<Code>(Code(target + " := #0")),
                     make_shared<Code>(Code("GOTO " + label_end)),
-                    make_shared<Code>(Code("LABEL " + label_true)),
+                    make_shared<Code>(Code("LABEL " + label_true + " :")),
                     make_shared<Code>(Code(target + " := #1")),
-                    make_shared<Code>(Code("LABEL " + label_end)),
+                    make_shared<Code>(Code("LABEL " + label_end + " :")),
             };
 
             auto code = make_shared<Code>(Code(codes));
@@ -956,9 +963,9 @@ void IntermediateCode::visit_Exp(ASTNode *node) {
                     make_shared<Code>(Code("IF " + place1 + " " + op + " " + place2 + " GOTO " + label_true)),
                     make_shared<Code>(Code(target + " := #0")),
                     make_shared<Code>(Code("GOTO " + label_end)),
-                    make_shared<Code>(Code("LABEL " + label_true)),
+                    make_shared<Code>(Code("LABEL " + label_true + " :")),
                     make_shared<Code>(Code(target + " := #1")),
-                    make_shared<Code>(Code("LABEL " + label_end)),
+                    make_shared<Code>(Code("LABEL " + label_end + " :")),
             };
 
             auto code = make_shared<Code>(Code(codes));
@@ -1030,9 +1037,9 @@ void IntermediateCode::visit_Exp(ASTNode *node) {
                     make_shared<Code>(Code("IF " + place + " != #0 GOTO " + label_false)),
                     make_shared<Code>(Code(target + " := #1")),
                     make_shared<Code>(Code("GOTO " + label_end)),
-                    make_shared<Code>(Code("LABEL " + label_false)),
+                    make_shared<Code>(Code("LABEL " + label_false + " :")),
                     make_shared<Code>(Code(target + " := #0")),
-                    make_shared<Code>(Code("LABEL " + label_end)),
+                    make_shared<Code>(Code("LABEL " + label_end + " :")),
             };
 
             auto code = make_shared<Code>(Code(codes));
@@ -1067,7 +1074,12 @@ void IntermediateCode::visit_Exp(ASTNode *node) {
         auto args = any_cast<vector<string>>(Args->attributes.at("irargs"));
 
         if (id == "write") {
-            auto code = make_shared<Code>(Code("WRITE " + args[0]));
+            vector<shared_ptr<Code>> codes{
+                    any_cast<shared_ptr<Code>>(Args->attributes.at("ircode")),
+                make_shared<Code>(Code("WRITE " + args[0]))
+            };
+
+            auto code = make_shared<Code>(codes);
 
             node->attributes["ircode"] = code;
         } else {
