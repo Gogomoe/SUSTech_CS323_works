@@ -147,6 +147,22 @@ void ASTAnalyzer::set_file(const std::string &filename) {
 
 void ASTAnalyzer::analyse() {
     try {
+
+        functionTable["read"] = make_shared<FunctionType>(
+                FunctionType(
+                        INT_TYPE,
+                        vector<pair<string, shared_ptr<Type>>>()
+                )
+        );
+        functionTable["write"] = make_shared<FunctionType>(
+                FunctionType(
+                        INT_TYPE,
+                        vector<pair<string, shared_ptr<Type>>>(
+                                {pair<string, shared_ptr<Type>>("write_char", INT_TYPE)}
+                        )
+                )
+        );
+
         pushSymbolTable();
         visit_node(this->root);
         popSymbolTable();

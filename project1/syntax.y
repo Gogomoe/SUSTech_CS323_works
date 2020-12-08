@@ -2,6 +2,7 @@
 %{
     #include "ASTNode.hpp"
     #include "SemanticAnalyzer.hpp"
+    #include "IntermediateCode.hpp"
     extern "C" {
       #include "lex.yy.c"
     }
@@ -236,8 +237,10 @@ int main(int argc, char **argv){
             analyzer.analyse();
 
             if (!error_happen) {
-                ASTPrinter printer;
-                printer.visit_node(program);
+                IntermediateCode generator(program);
+                generator.set_file(file_path);
+
+                generator.generate();
             }
         } else if (error) {
             fprintf(stderr, "Syntax error\n");
