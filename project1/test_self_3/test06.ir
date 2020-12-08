@@ -1,0 +1,50 @@
+FUNCTION print :
+PARAM a
+PARAM b
+t1 := a
+WRITE t1
+t3 := b
+WRITE t3
+t5 := a
+t6 := b
+t4 := t5 + t6
+RETURN t4
+FUNCTION main :
+READ x
+t9 := x
+t11 := x
+t13 := x
+t14 := x
+t12 := t13 * t14
+t10 := t11 + t12
+ARG t10
+ARG t9
+t8 := CALL print
+WRITE t8
+t18 := #1
+t19 := #2
+t17 := t18 + t19
+t16 := #0 - t17
+WRITE t16
+t23 := #1
+t24 := #2
+t22 := t23 + t24
+IF t22 != #0 GOTO label0
+t21 := #1
+GOTO label1
+LABEL label0 :
+t21 := #0
+LABEL label1 :
+WRITE t21
+t28 := #1
+t29 := #1
+t27 := t28 - t29
+IF t27 != #0 GOTO label2
+t26 := #1
+GOTO label3
+LABEL label2 :
+t26 := #0
+LABEL label3 :
+WRITE t26
+t30 := #0
+RETURN t30
