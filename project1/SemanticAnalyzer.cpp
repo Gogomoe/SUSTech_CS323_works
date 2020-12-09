@@ -440,8 +440,9 @@ void ASTAnalyzer::visit_VarDec(ASTNode *node) {
         auto size = any_cast<int>(INT->attributes.at("int_value"));
 
         string id = declaration.first;
+        shared_ptr<Type> inner_type = declaration.second;
 
-        auto actual = make_shared<ArrayType>(ArrayType(type, size));
+        auto actual = make_shared<ArrayType>(ArrayType(inner_type, size));
         shared_ptr<Type> arrType = actual;
 
         node->attributes["declaration"] = pair<string, shared_ptr<Type>>{id, arrType};
