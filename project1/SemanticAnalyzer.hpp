@@ -7,7 +7,9 @@
 class Type {
 public:
     std::string name;
+    int width;
 
+    Type(std::string, int);
     explicit Type(std::string);
 
     virtual bool type_equals(std::shared_ptr<Type> type);

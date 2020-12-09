@@ -16,24 +16,27 @@ using std::any;
 using std::any_cast;
 using std::runtime_error;
 
-Type::Type(string name_) : name(std::move(name_)) {}
+Type::Type(string name_, int width) : name(std::move(name_)), width(width) {}
+
+Type::Type(string name_) : Type(name_, -1) {}
+
 
 bool Type::type_equals(std::shared_ptr<Type> type) {
     return this->name == type->name;
 }
 
-IntType::IntType() : Type("int") {}
+IntType::IntType() : Type("int", 4) {}
 
-FloatType::FloatType() : Type("float") {}
+FloatType::FloatType() : Type("float", 4) {}
 
-CharType::CharType() : Type("char") {}
+CharType::CharType() : Type("char", 4) {}
 
-StringType::StringType() : Type("string") {}
+StringType::StringType() : Type("string", 4) {}
 
 ArrayType::ArrayType(
         const std::shared_ptr<Type> &type_,
         int size_
-) : Type((*type_).name + "[" + std::to_string(size_) + "]"),
+) : Type((*type_).name + "[" + std::to_string(size_) + "]", type_->width * size_),
     type(type_),
     size(size_) {}
 
@@ -51,7 +54,13 @@ StructType::StructType(
         vector<pair<string, shared_ptr<Type>>> fields_
 ) : Type(identify_),
     identify(identify_),
-    fields(std::move(fields_)) {}
+    fields(std::move(fields_)) {
+    int width = 0;
+    for (auto &it:fields) {
+        width += it.second->width;
+    }
+    this->width = width;
+}
 
 bool StructType::type_equals(std::shared_ptr<Type> other) {
     shared_ptr<StructType> other_type = dynamic_pointer_cast<StructType>(other);

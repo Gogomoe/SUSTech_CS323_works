@@ -130,7 +130,9 @@ void IntermediateCode::visit_ExtDef(ASTNode *node) {
 
 //        visit_Specifier(Specifier);
 
-        throw runtime_error("not generate code for ExtDef: Specifier SEMI");
+        auto code = make_shared<Code>(Code(""));
+
+        node->attributes["ircode"] = code;
 
     } else if (node->children.size() == 3 && node->children[2]->name == "SEMI") {
         // ExtDef: Specifier ExtDecList SEMI
@@ -242,12 +244,26 @@ void IntermediateCode::visit_VarDec(ASTNode *node) {
         // VarDec: ID
         ASTNode *ID = node->children[0];
 
-        auto id = any_cast<string>(ID->attributes.at("string_value"));
+        auto declaration = any_cast<pair<string, shared_ptr<Type>>>(node->attributes.at("declaration"));
 
-        createSymbol(id);
+        string id = declaration.first;
+        shared_ptr<Type> type = declaration.second;
 
-        node->attributes["irname"] = id;
-        node->attributes["ircode"] = make_shared<Code>(Code(""));
+        string irname = createSymbol(id);
+
+        if (dynamic_pointer_cast<IntType>(type) != nullptr) {
+            node->attributes["irname"] = id;
+            node->attributes["ircode"] = make_shared<Code>(Code(""));
+        } else {
+            auto struct_type = dynamic_pointer_cast<StructType>(type);
+            int width = struct_type->width;
+
+            node->attributes["irname"] = id;
+            node->attributes["ircode"] = make_shared<Code>(
+                    Code("DEC " + irname + " " + std::to_string(width))
+            );
+        }
+
 
     } else if (node->children.size() == 4) {
         // VarDec: VarDec LB INT RB
@@ -256,7 +272,20 @@ void IntermediateCode::visit_VarDec(ASTNode *node) {
 
 //        visit_VarDec(VarDec);
 
-        throw runtime_error("not generate code for VarDec: VarDec LB INT RB");
+        auto declaration = any_cast<pair<string, shared_ptr<Type>>>(node->attributes.at("declaration"));
+
+        string id = declaration.first;
+        shared_ptr<Type> type = declaration.second;
+
+        string irname = createSymbol(id);
+
+        int size = any_cast<int>(INT->attributes.at("int_value"));
+        int width = type->width;
+
+        node->attributes["irname"] = id;
+        node->attributes["ircode"] = make_shared<Code>(
+                Code("DEC " + irname + " " + std::to_string(size * width))
+        );
 
     } else {
         throw runtime_error("error VarDec children");
@@ -828,9 +857,17 @@ void IntermediateCode::visit_Exp(ASTNode *node) {
         ASTNode *ID = node->children[0];
 
         auto id = any_cast<string>(ID->attributes.at("string_value"));
+        auto type = any_cast<optional<shared_ptr<Type>>>(node->attributes.at("type"));
 
         node->attributes["irname"] = id;
-        node->attributes["ircode"] = make_shared<Code>(Code(target + " := " + symbolTable.at(id)));
+
+        if (dynamic_pointer_cast<IntType>(type.value()) != nullptr) {
+            node->attributes["ircode"] = make_shared<Code>(Code(target + " := " + symbolTable.at(id)));
+        } else {
+            string iraddr = symbolTable.at(id);
+            node->attributes["ircode"] = make_shared<Code>(Code(target + " := *" + iraddr));
+            node->attributes["iraddr"] = iraddr;
+        }
 
     } else if (node->children.size() == 1 && node->children[0]->name == "INT") {
         // Exp: INT
@@ -883,17 +920,35 @@ void IntermediateCode::visit_Exp(ASTNode *node) {
         visit_Exp(Exp2);
 
         if (OP->name == "ASSIGN") {
-            auto id = any_cast<string>(Exp1->attributes.at("irname"));
 
-            vector<shared_ptr<Code>> codes{
-                    any_cast<shared_ptr<Code>>(Exp2->attributes.at("ircode")),
-                    make_shared<Code>(Code(symbolTable.at(id) + " := " + place2)),
-                    make_shared<Code>(Code(target + " := " + place2)),
-            };
+            if (Exp1->attributes.find("irname") != Exp1->attributes.end()) {
+                auto id = any_cast<string>(Exp1->attributes.at("irname"));
 
-            auto code = make_shared<Code>(Code(codes));
+                vector<shared_ptr<Code>> codes{
+                        any_cast<shared_ptr<Code>>(Exp2->attributes.at("ircode")),
+                        make_shared<Code>(Code(symbolTable.at(id) + " := " + place2)),
+                        make_shared<Code>(Code(target + " := " + place2)),
+                };
 
-            node->attributes["ircode"] = code;
+                auto code = make_shared<Code>(Code(codes));
+
+                node->attributes["ircode"] = code;
+
+            } else {
+                auto iraddr = any_cast<string>(Exp1->attributes.at("iraddr"));
+
+                vector<shared_ptr<Code>> codes{
+                        any_cast<shared_ptr<Code>>(Exp1->attributes.at("ircode")),
+                        any_cast<shared_ptr<Code>>(Exp2->attributes.at("ircode")),
+                        make_shared<Code>(Code("*" + iraddr + " := " + place2)),
+                        make_shared<Code>(Code(target + " := " + place2)),
+                };
+
+                auto code = make_shared<Code>(Code(codes));
+
+                node->attributes["ircode"] = code;
+
+            }
 
         } else if (OP->name == "AND") {
             string label_false = createLabel();
@@ -1076,7 +1131,7 @@ void IntermediateCode::visit_Exp(ASTNode *node) {
         if (id == "write") {
             vector<shared_ptr<Code>> codes{
                     any_cast<shared_ptr<Code>>(Args->attributes.at("ircode")),
-                make_shared<Code>(Code("WRITE " + args[0]))
+                    make_shared<Code>(Code("WRITE " + args[0]))
             };
 
             auto code = make_shared<Code>(codes);
@@ -1104,10 +1159,33 @@ void IntermediateCode::visit_Exp(ASTNode *node) {
         ASTNode *Exp1 = node->children[0];
         ASTNode *Exp2 = node->children[2];
 
-//        visit_Exp(Exp1);
-//        visit_Exp(Exp2);
+        string place = createTempSymbol();
+        string index = createTempSymbol();
 
-        throw runtime_error("not generate code for Exp: Exp LB Exp RB");
+        node->attributes["irplace"] = place;
+        visit_Exp(Exp1);
+        node->attributes["irplace"] = index;
+        visit_Exp(Exp2);
+
+
+        auto type = any_cast<optional<shared_ptr<Type>>>(Exp1->attributes.at("type"));
+        auto array_type = dynamic_pointer_cast<ArrayType>(type.value());
+        auto inner_width = array_type->type->width;
+        auto start_addr = any_cast<string>(Exp1->attributes.at("iraddr"));
+
+        string offset = createTempSymbol();
+        string iraddr = createTempSymbol();
+
+        vector<shared_ptr<Code>> codes{
+                any_cast<shared_ptr<Code>>(Exp1->attributes.at("ircode")),
+                any_cast<shared_ptr<Code>>(Exp2->attributes.at("ircode")),
+                make_shared<Code>(Code(offset + " := " + index + " * #" + std::to_string(inner_width))),
+                make_shared<Code>(Code(iraddr + " := " + start_addr + " + " + offset)),
+                make_shared<Code>(Code(target + " := *" + iraddr))
+        };
+
+        node->attributes["ircode"] = make_shared<Code>(Code(codes));
+        node->attributes["iraddr"] = iraddr;
 
 
     } else if (node->children.size() == 3 && node->children[1]->name == "DOT") {
@@ -1117,10 +1195,33 @@ void IntermediateCode::visit_Exp(ASTNode *node) {
 
         auto id = any_cast<string>(ID->attributes.at("string_value"));
 
-//        visit_Exp(Exp);
+        string place = createTempSymbol();
 
-        throw runtime_error("not generate code for Exp: Exp DOT ID");
+        node->attributes["irplace"] = place;
+        visit_Exp(Exp);
 
+        auto type = any_cast<optional<shared_ptr<Type>>>(Exp->attributes.at("type"));
+        auto struct_type = dynamic_pointer_cast<StructType>(type.value());
+        auto start_addr = any_cast<string>(Exp->attributes.at("iraddr"));
+
+        string iraddr = createTempSymbol();
+
+        int offset = 0;
+        for (auto &it:struct_type->fields) {
+            if (it.first == id) {
+                break;
+            }
+            offset += it.second->width;
+        }
+
+        vector<shared_ptr<Code>> codes{
+                any_cast<shared_ptr<Code>>(Exp->attributes.at("ircode")),
+                make_shared<Code>(Code(iraddr + " := " + start_addr + " + #" + std::to_string(offset))),
+                make_shared<Code>(Code(target + " := *" + iraddr))
+        };
+
+        node->attributes["ircode"] = make_shared<Code>(Code(codes));
+        node->attributes["iraddr"] = iraddr;
 
     } else {
         throw runtime_error("error Exp children");
@@ -1140,7 +1241,15 @@ void IntermediateCode::visit_Args(ASTNode *node) {
         visit_Exp(Exp);
 
         auto ir_args = vector<string>();
-        ir_args.push_back(place);
+
+        auto type = any_cast<optional<shared_ptr<Type>>>(Exp->attributes.at("type"));
+
+        if (dynamic_pointer_cast<IntType>(type.value()) != nullptr) {
+            ir_args.push_back(place);
+        } else {
+            auto iraddr = any_cast<string>(Exp->attributes.at("iraddr"));
+            ir_args.push_back(iraddr);
+        }
 
         node->attributes["irargs"] = ir_args;
         node->attributes["ircode"] = Exp->attributes.at("ircode");
@@ -1158,7 +1267,15 @@ void IntermediateCode::visit_Args(ASTNode *node) {
         visit_Args(Args);
 
         auto ir_args = vector<string>();
-        ir_args.push_back(place);
+
+        auto type = any_cast<optional<shared_ptr<Type>>>(Exp->attributes.at("type"));
+
+        if (dynamic_pointer_cast<IntType>(type.value()) != nullptr) {
+            ir_args.push_back(place);
+        } else {
+            auto iraddr = any_cast<string>(Exp->attributes.at("iraddr"));
+            ir_args.push_back(iraddr);
+        }
 
         auto args = any_cast<vector<string>>(Args->attributes.at("irargs"));
         ir_args.insert(ir_args.end(), args.begin(), args.end());
