@@ -116,6 +116,51 @@ void IntermediateCode::generate() {
     }
 }
 
+int _debug_ = 0;
+int _level_ = 0;
+
+void _debug_start_(ASTNode *node) {
+    for (int i = 0; i < _level_; i++) {
+        if (_debug_) {
+            printf(" ");
+        }
+    }
+    if (_debug_) {
+        printf("%s: ", node->name.data());
+    }
+    for (auto &_it_:node->children) {
+        if (_debug_) {
+            printf("%s: ", _it_->name.data());
+        }
+    }
+    if (_debug_) {
+        printf("\n");
+    }
+
+    _level_++;
+}
+
+void _debug_end_(ASTNode *node) {
+    _level_--;
+
+    for (int i = 0; i < _level_; i++) {
+        if (_debug_) {
+            printf(" ");
+        }
+    }
+    if (_debug_) {
+        printf("%s: ", node->name.data());
+    }
+    for (auto &_it_:node->children) {
+        if (_debug_) {
+            printf("%s: ", _it_->name.data());
+        }
+    }
+    if (_debug_) {
+        printf("\n");
+    }
+}
+
 void IntermediateCode::visit_Program(ASTNode *node) {
     //_debug_start_(node);
     ASTNode *ExtDefList = node->children[1];
