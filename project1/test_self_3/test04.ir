@@ -1,15 +1,13 @@
 FUNCTION add :
 PARAM temp
-t3 := *temp
-t4 := #0
-t5 := t4 * #4
-t6 := temp + t5
-t1 := *t6
-t7 := *temp
-t8 := #1
-t9 := t8 * #4
-t10 := temp + t9
-t2 := *t10
+t3index := #0
+t4offset := t3index * #4
+t5addr := temp + t4offset
+t1 := *t5addr
+t6index := #1
+t7offset := t6index * #4
+t8addr := temp + t7offset
+t2 := *t8addr
 t0 := t1 + t2
 RETURN t0
 FUNCTION main :
@@ -18,75 +16,65 @@ DEC r 16
 i := #0
 j := #0
 LABEL label0 :
-t12 := i
-t13 := #2
-IF t12 < t13 GOTO label2
-t11 := #0
+t10 := i
+t11 := #2
+IF t10 < t11 GOTO label2
+t9cond := #0
 GOTO label3
 LABEL label2 :
-t11 := #1
+t9cond := #1
 LABEL label3 :
-IF t11 == #0 GOTO label1
+IF t9cond == #0 GOTO label1
 LABEL label4 :
-t15 := j
-t16 := #2
-IF t15 < t16 GOTO label6
-t14 := #0
+t13 := j
+t14 := #2
+IF t13 < t14 GOTO label6
+t12cond := #0
 GOTO label7
 LABEL label6 :
-t14 := #1
+t12cond := #1
 LABEL label7 :
-IF t14 == #0 GOTO label5
-t20 := *op
+IF t12cond == #0 GOTO label5
+t17index := j
+t18offset := t17index * #4
+t19addr := op + t18offset
+t15 := *t19addr
+t20 := i
 t21 := j
-t22 := t21 * #4
-t23 := op + t22
-t18 := *t23
-t24 := i
-t25 := j
-t19 := t24 + t25
-*t23 := t19
-t17 := t19
-t29 := j
-t30 := #1
-t28 := t29 + t30
-j := t28
-t26 := t28
+t16 := t20 + t21
+*t19addr := t16
+t24 := j
+t25 := #1
+t23 := t24 + t25
+j := t23
 GOTO label4
 LABEL label5 :
-t36 := *r
-t37 := #0
-t38 := t37 * #4
-t39 := r + t38
-t34 := *t39
-t35 := i
-t40 := t35 * #4
-t41 := t39 + t40
-t32 := *t41
-t42 := *op
+t29index := #0
+t30offset := t29index * #4
+t31addr := r + t30offset
+t28index := i
+t32offset := t28index * #4
+t33addr := t31addr + t32offset
+t26 := *t33addr
+t34arg := *op
 ARG op
-t33 := CALL add
-*t41 := t33
-t31 := t33
-t47 := *r
+t27 := CALL add
+*t33addr := t27
+t38index := #0
+t39offset := t38index * #4
+t40addr := r + t39offset
+t37index := i
+t41offset := t37index * #4
+t42addr := t40addr + t41offset
+t36arg := *t42addr
+WRITE t36arg
+t45 := i
+t46 := #1
+t44 := t45 + t46
+i := t44
 t48 := #0
-t49 := t48 * #4
-t50 := r + t49
-t45 := *t50
-t46 := i
-t51 := t46 * #4
-t52 := t50 + t51
-t44 := *t52
-WRITE t44
-t56 := i
-t57 := #1
-t55 := t56 + t57
-i := t55
-t53 := t55
-t60 := #0
-j := t60
-t58 := t60
+j := t48
 GOTO label0
 LABEL label1 :
-t61 := #0
-RETURN t61
+t49 := #0
+RETURN t49

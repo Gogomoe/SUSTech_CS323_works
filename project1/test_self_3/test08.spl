@@ -1,0 +1,17 @@
+int main()
+{
+    int a;
+    int b;
+
+    a = (1 > 2) && (b = 2);
+
+    write(a);
+    write(b);
+
+    a = (1 < 2) || (b = 3);
+
+    write(a);
+    write(b);
+
+    return 0;
+}

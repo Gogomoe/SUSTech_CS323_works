@@ -1,0 +1,83 @@
+FUNCTION main :
+t2 := #0
+IF t2 == #0 GOTO label0
+t3 := #0
+IF t3 == #0 GOTO label0
+t1arg := #1
+GOTO label1
+LABEL label0 :
+t1arg := #0
+LABEL label1 :
+WRITE t1arg
+t6 := #0
+IF t6 == #0 GOTO label2
+t7 := #1
+IF t7 == #0 GOTO label2
+t5arg := #1
+GOTO label3
+LABEL label2 :
+t5arg := #0
+LABEL label3 :
+WRITE t5arg
+t10 := #1
+IF t10 == #0 GOTO label4
+t11 := #0
+IF t11 == #0 GOTO label4
+t9arg := #1
+GOTO label5
+LABEL label4 :
+t9arg := #0
+LABEL label5 :
+WRITE t9arg
+t14 := #1
+IF t14 == #0 GOTO label6
+t15 := #1
+IF t15 == #0 GOTO label6
+t13arg := #1
+GOTO label7
+LABEL label6 :
+t13arg := #0
+LABEL label7 :
+WRITE t13arg
+t18 := #0
+IF t18 != #0 GOTO label8
+t19 := #0
+IF t19 != #0 GOTO label8
+t17arg := #0
+GOTO label9
+LABEL label8 :
+t17arg := #1
+LABEL label9 :
+WRITE t17arg
+t22 := #0
+IF t22 != #0 GOTO label10
+t23 := #1
+IF t23 != #0 GOTO label10
+t21arg := #0
+GOTO label11
+LABEL label10 :
+t21arg := #1
+LABEL label11 :
+WRITE t21arg
+t26 := #1
+IF t26 != #0 GOTO label12
+t27 := #0
+IF t27 != #0 GOTO label12
+t25arg := #0
+GOTO label13
+LABEL label12 :
+t25arg := #1
+LABEL label13 :
+WRITE t25arg
+t30 := #1
+IF t30 != #0 GOTO label14
+t31 := #1
+IF t31 != #0 GOTO label14
+t29arg := #0
+GOTO label15
+LABEL label14 :
+t29arg := #1
+LABEL label15 :
+WRITE t29arg
+t32 := #0
+RETURN t32

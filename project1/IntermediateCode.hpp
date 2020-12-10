@@ -11,7 +11,7 @@ public:
 
     explicit Code(std::string);
 
-    Code(std::vector<std::shared_ptr<Code>>);
+    explicit Code(std::vector<std::shared_ptr<Code>>);
 
 };
 

@@ -3,12 +3,12 @@ PARAM n
 t1 := n
 t2 := #1
 IF t1 == t2 GOTO label3
-t0 := #0
+t0cond := #0
 GOTO label4
 LABEL label3 :
-t0 := #1
+t0cond := #1
 LABEL label4 :
-IF t0 != #0 GOTO label0
+IF t0cond != #0 GOTO label0
 GOTO label1
 LABEL label0 :
 t3 := n
@@ -18,39 +18,36 @@ LABEL label1 :
 t5 := n
 t8 := n
 t9 := #1
-t7 := t8 - t9
-ARG t7
+t7arg := t8 - t9
+ARG t7arg
 t6 := CALL fact
 t4 := t5 * t6
 RETURN t4
 LABEL label2 :
 FUNCTION main :
-READ t12
-m := t12
-t10 := t12
-t14 := m
-t15 := #1
-IF t14 > t15 GOTO label8
-t13 := #0
+READ t11
+m := t11
+t13 := m
+t14 := #1
+IF t13 > t14 GOTO label8
+t12cond := #0
 GOTO label9
 LABEL label8 :
-t13 := #1
+t12cond := #1
 LABEL label9 :
-IF t13 != #0 GOTO label5
+IF t12cond != #0 GOTO label5
 GOTO label6
 LABEL label5 :
-t19 := m
-ARG t19
-t18 := CALL fact
-result := t18
-t16 := t18
+t17arg := m
+ARG t17arg
+t16 := CALL fact
+result := t16
 GOTO label7
 LABEL label6 :
-t22 := #1
-result := t22
-t20 := t22
+t19 := #1
+result := t19
 LABEL label7 :
-t24 := result
-WRITE t24
-t25 := #0
-RETURN t25
+t21arg := result
+WRITE t21arg
+t22 := #0
+RETURN t22

@@ -1,0 +1,15 @@
+int main()
+{
+
+    write(0 && 0);
+    write(0 && 1);
+    write(1 && 0);
+    write(1 && 1);
+
+    write(0 || 0);
+    write(0 || 1);
+    write(1 || 0);
+    write(1 || 1);
+
+    return 0;
+}
