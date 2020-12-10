@@ -34,10 +34,13 @@ class IntermediateCode : public ASTVisitor {
     int label_count = 0;
 
     std::map<std::string, std::string> symbolTable{};
+    std::map<std::string, int> tempSymbols{};
 
     std::string createSymbol(const std::string &);
 
     std::string createTempSymbol();
+
+    std::string createTempSymbol(const std::string &);
 
     std::string createLabel();
 

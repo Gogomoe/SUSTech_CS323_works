@@ -13,6 +13,15 @@ using std::any;
 using std::any_cast;
 using std::runtime_error;
 
+template<typename ... Args>
+std::string string_format(const std::string &format, Args ... args) {
+    size_t size = snprintf(nullptr, 0, format.c_str(), args ...) + 1; // Extra space for '\0'
+    if (size <= 0) { throw std::runtime_error("Error during formatting."); }
+    std::unique_ptr<char[]> buf(new char[size]);
+    snprintf(buf.get(), size, format.c_str(), args ...);
+    return std::string(buf.get(), buf.get() + size - 1); // We don't want the '\0' inside
+}
+
 Code::Code(string code) : code(std::move(code)), codes() {}
 
 Code::Code(std::vector<std::shared_ptr<Code>> codes) : code(), codes(codes) {}
@@ -31,10 +40,18 @@ std::string IntermediateCode::createSymbol(const std::string &symbol) {
     return name;
 }
 
-std::string IntermediateCode::createTempSymbol() {
-    string name = "t" + std::to_string(temp_count);
+std::string IntermediateCode::createTempSymbol(const std::string &prefix) {
+    if (tempSymbols.find(prefix) == tempSymbols.end()) {
+        tempSymbols[prefix] = 0;
+    }
+    string symbol = "t" + string_format("%d", temp_count) + prefix;
+    tempSymbols[prefix]++;
     temp_count++;
-    return name;
+    return symbol;
+}
+
+std::string IntermediateCode::createTempSymbol() {
+    return createTempSymbol("");
 }
 
 std::string IntermediateCode::createLabel() {
@@ -466,7 +483,7 @@ void IntermediateCode::visit_Stmt(ASTNode *node) {
         string label_true = createLabel();
         string label_false = createLabel();
 
-        string place = createTempSymbol();
+        string place = createTempSymbol("cond");
         node->attributes["irplace"] = place;
 
         visit_Exp(Exp);
@@ -495,7 +512,7 @@ void IntermediateCode::visit_Stmt(ASTNode *node) {
         string label_false = createLabel();
         string label_end = createLabel();
 
-        string place = createTempSymbol();
+        string place = createTempSymbol("cond");
         node->attributes["irplace"] = place;
 
         visit_Exp(Exp);
@@ -527,7 +544,7 @@ void IntermediateCode::visit_Stmt(ASTNode *node) {
         string label_loop = createLabel();
         string label_end = createLabel();
 
-        string place = createTempSymbol();
+        string place = createTempSymbol("cond");
         node->attributes["irplace"] = place;
 
         visit_Exp(Exp);
@@ -560,7 +577,7 @@ void IntermediateCode::visit_Stmt(ASTNode *node) {
         string label_loop = createLabel();
         string label_end = createLabel();
 
-        string place = createTempSymbol();
+        string place = createTempSymbol("cond");
         node->attributes["irplace"] = place;
 
         visit_Exp(Exp);
@@ -591,8 +608,8 @@ void IntermediateCode::visit_Stmt(ASTNode *node) {
 
         auto it_name = any_cast<string>(ID->attributes.at("string_value"));
 
-        string place1 = createTempSymbol();
-        string place2 = createTempSymbol();
+        string place1 = createTempSymbol("start");
+        string place2 = createTempSymbol("end");
         string place_it = createSymbol(it_name);
 
         node->attributes["irplace"] = place1;
@@ -637,8 +654,8 @@ void IntermediateCode::visit_Stmt(ASTNode *node) {
         auto loop_label = any_cast<string>(ID0->attributes.at("string_value"));
         auto it_name = any_cast<string>(ID1->attributes.at("string_value"));
 
-        string place1 = createTempSymbol();
-        string place2 = createTempSymbol();
+        string place1 = createTempSymbol("start");
+        string place2 = createTempSymbol("end");
         string place_it = createSymbol(it_name);
 
         node->attributes["irplace"] = place1;
@@ -1160,7 +1177,7 @@ void IntermediateCode::visit_Exp(ASTNode *node) {
         ASTNode *Exp2 = node->children[2];
 
         string place = createTempSymbol();
-        string index = createTempSymbol();
+        string index = createTempSymbol("index");
 
         node->attributes["irplace"] = place;
         visit_Exp(Exp1);
@@ -1173,8 +1190,8 @@ void IntermediateCode::visit_Exp(ASTNode *node) {
         auto inner_width = array_type->type->width;
         auto start_addr = any_cast<string>(Exp1->attributes.at("iraddr"));
 
-        string offset = createTempSymbol();
-        string iraddr = createTempSymbol();
+        string offset = createTempSymbol("offset");
+        string iraddr = createTempSymbol("addr");
 
         vector<shared_ptr<Code>> codes{
                 any_cast<shared_ptr<Code>>(Exp1->attributes.at("ircode")),
@@ -1204,7 +1221,7 @@ void IntermediateCode::visit_Exp(ASTNode *node) {
         auto struct_type = dynamic_pointer_cast<StructType>(type.value());
         auto start_addr = any_cast<string>(Exp->attributes.at("iraddr"));
 
-        string iraddr = createTempSymbol();
+        string iraddr = createTempSymbol("addr");
 
         int offset = 0;
         for (auto &it:struct_type->fields) {
@@ -1235,7 +1252,7 @@ void IntermediateCode::visit_Args(ASTNode *node) {
         // Args: Exp
         ASTNode *Exp = node->children[0];
 
-        string place = createTempSymbol();
+        string place = createTempSymbol("arg");
 
         node->attributes["irplace"] = place;
         visit_Exp(Exp);
@@ -1259,7 +1276,7 @@ void IntermediateCode::visit_Args(ASTNode *node) {
         ASTNode *Exp = node->children[0];
         ASTNode *Args = node->children[2];
 
-        string place = createTempSymbol();
+        string place = createTempSymbol("arg");
 
         node->attributes["irplace"] = place;
         visit_Exp(Exp);
