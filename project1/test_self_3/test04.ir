@@ -16,65 +16,57 @@ DEC r 16
 i := #0
 j := #0
 LABEL label0 :
-t10 := i
-t11 := #2
-IF t10 < t11 GOTO label2
-t9cond := #0
-GOTO label3
-LABEL label2 :
-t9cond := #1
-LABEL label3 :
-IF t9cond == #0 GOTO label1
-LABEL label4 :
-t13 := j
-t14 := #2
-IF t13 < t14 GOTO label6
-t12cond := #0
-GOTO label7
-LABEL label6 :
-t12cond := #1
-LABEL label7 :
-IF t12cond == #0 GOTO label5
-t17index := j
-t18offset := t17index * #4
-t19addr := op + t18offset
-t15 := *t19addr
-t20 := i
-t21 := j
-t16 := t20 + t21
-*t19addr := t16
-t24 := j
-t25 := #1
-t23 := t24 + t25
-j := t23
-GOTO label4
-LABEL label5 :
-t29index := #0
-t30offset := t29index * #4
-t31addr := r + t30offset
-t28index := i
-t32offset := t28index * #4
-t33addr := t31addr + t32offset
-t26 := *t33addr
-t34arg := *op
-ARG op
-t27 := CALL add
-*t33addr := t27
-t38index := #0
-t39offset := t38index * #4
-t40addr := r + t39offset
-t37index := i
-t41offset := t37index * #4
-t42addr := t40addr + t41offset
-t36arg := *t42addr
-WRITE t36arg
-t45 := i
-t46 := #1
-t44 := t45 + t46
-i := t44
-t48 := #0
-j := t48
-GOTO label0
+t9 := i
+t10 := #2
+IF t9 < t10 GOTO label1
+GOTO label2
 LABEL label1 :
-t49 := #0
-RETURN t49
+LABEL label3 :
+t11 := j
+t12 := #2
+IF t11 < t12 GOTO label4
+GOTO label5
+LABEL label4 :
+t15index := j
+t16offset := t15index * #4
+t17addr := op + t16offset
+t13 := *t17addr
+t18 := i
+t19 := j
+t14 := t18 + t19
+*t17addr := t14
+t22 := j
+t23 := #1
+t21 := t22 + t23
+j := t21
+GOTO label3
+LABEL label5 :
+t27index := #0
+t28offset := t27index * #4
+t29addr := r + t28offset
+t26index := i
+t30offset := t26index * #4
+t31addr := t29addr + t30offset
+t24 := *t31addr
+t32arg := *op
+ARG op
+t25 := CALL add
+*t31addr := t25
+t36index := #0
+t37offset := t36index * #4
+t38addr := r + t37offset
+t35index := i
+t39offset := t35index * #4
+t40addr := t38addr + t39offset
+t34arg := *t40addr
+WRITE t34arg
+t43 := i
+t44 := #1
+t42 := t43 + t44
+i := t42
+t46 := #0
+j := t46
+GOTO label0
+LABEL label2 :
+t47 := #0
+RETURN t47

@@ -117,16 +117,19 @@ void IntermediateCode::generate() {
 }
 
 void IntermediateCode::visit_Program(ASTNode *node) {
+    //_debug_start_(node);
     ASTNode *ExtDefList = node->children[1];
 
     visit_ExtDefList(ExtDefList);
 
     node->attributes["ircode"] = ExtDefList->attributes.at("ircode");
+    //_debug_end_(node);
 }
 
 
 // definitions: vector<pair<string, shared_ptr<Type>>>
 void IntermediateCode::visit_ExtDefList(ASTNode *node) {
+    //_debug_start_(node);
     if (node->children.empty()) {
         // ExtDefList: %empty
         node->attributes["ircode"] = make_shared<Code>(Code(""));
@@ -149,10 +152,12 @@ void IntermediateCode::visit_ExtDefList(ASTNode *node) {
     } else {
         throw runtime_error("error ExtDefList children");
     }
+    //_debug_end_(node);
 }
 
 // definitions: vector<pair<string, shared_ptr<Type>>>
 void IntermediateCode::visit_ExtDef(ASTNode *node) {
+    //_debug_start_(node);
     if (node->children.size() == 2 && node->children[1]->name == "SEMI") {
         // ExtDef: Specifier SEMI
         ASTNode *Specifier = node->children[0];
@@ -194,10 +199,12 @@ void IntermediateCode::visit_ExtDef(ASTNode *node) {
     } else {
         throw runtime_error("error ExtDef children");
     }
+    //_debug_end_(node);
 }
 
 // definitions: vector<pair<string, shared_ptr<Type>>>
 void IntermediateCode::visit_ExtDecList(ASTNode *node) {
+    //_debug_start_(node);
     if (node->children.size() == 1) {
         // ExtDecList: VarDec
         ASTNode *VarDec = node->children[0];
@@ -219,11 +226,12 @@ void IntermediateCode::visit_ExtDecList(ASTNode *node) {
     } else {
         throw runtime_error("error DecList children");
     }
-
+    //_debug_end_(node);
 }
 
 // type: Type*
 void IntermediateCode::visit_Specifier(ASTNode *node) {
+    //_debug_start_(node);
     if (node->children[0]->name == "TYPE") {
         // Specifier: TYPE
         ASTNode *TYPE = node->children[0];
@@ -242,11 +250,12 @@ void IntermediateCode::visit_Specifier(ASTNode *node) {
     } else {
         throw runtime_error("error Specifier child");
     }
-
+    //_debug_end_(node);
 }
 
 // type: Type*
 void IntermediateCode::visit_StructSpecifier(ASTNode *node) {
+    //_debug_start_(node);
     if (node->children.size() == 2) {
         // StructSpecifier: STRUCT ID
         ASTNode *ID = node->children[1];
@@ -265,10 +274,12 @@ void IntermediateCode::visit_StructSpecifier(ASTNode *node) {
     } else {
         throw runtime_error("error StructSpecifier children");
     }
+    //_debug_end_(node);
 }
 
 // declaration: pair<string, shared_ptr<Type>>
 void IntermediateCode::visit_VarDec(ASTNode *node) {
+    //_debug_start_(node);
     if (node->children.size() == 1) {
         // VarDec: ID
         ASTNode *ID = node->children[0];
@@ -319,10 +330,12 @@ void IntermediateCode::visit_VarDec(ASTNode *node) {
     } else {
         throw runtime_error("error VarDec children");
     }
+    //_debug_end_(node);
 }
 
 // declaration: pair<string, shared_ptr<Type>>
 void IntermediateCode::visit_FunDec(ASTNode *node) {
+    //_debug_start_(node);
     auto returnType = any_cast<shared_ptr<Type>>(node->parent->attributes.at("return_type"));
 
     if (node->children.size() == 3) {
@@ -357,10 +370,12 @@ void IntermediateCode::visit_FunDec(ASTNode *node) {
     } else {
         throw runtime_error("error FunDec children");
     }
+    //_debug_end_(node);
 }
 
 // parameters: vector<pair<string, shared_ptr<Type>>>
 void IntermediateCode::visit_VarList(ASTNode *node) {
+    //_debug_start_(node);
     if (node->children.size() == 1) {
         // VarList: ParamDec
         ASTNode *ParamDec = node->children[0];
@@ -382,11 +397,13 @@ void IntermediateCode::visit_VarList(ASTNode *node) {
     } else {
         throw runtime_error("error VarList children");
     }
+    //_debug_end_(node);
 }
 
 // declaration: pair<string, shared_ptr<Type>>
 // type: Type*
 void IntermediateCode::visit_ParamDec(ASTNode *node) {
+    //_debug_start_(node);
     // ParamDec: Specifier VarDec
     ASTNode *Specifier = node->children[0];
     ASTNode *VarDec = node->children[1];
@@ -395,11 +412,12 @@ void IntermediateCode::visit_ParamDec(ASTNode *node) {
 //    visit_VarDec(VarDec);
 
     throw runtime_error("not generate code for ParamDec");
-
+    //_debug_end_(node);
 }
 
 // return_type: Type*
 void IntermediateCode::visit_CompSt(ASTNode *node) {
+    //_debug_start_(node);
     // CompSt: LC DefList StmtList RC
     ASTNode *DefList = node->children[1];
     ASTNode *StmtList = node->children[2];
@@ -413,11 +431,12 @@ void IntermediateCode::visit_CompSt(ASTNode *node) {
     auto code = make_shared<Code>(Code({codeA, codeB}));
 
     node->attributes["ircode"] = code;
-
+    //_debug_end_(node);
 }
 
 // return_type: Type*
 void IntermediateCode::visit_StmtList(ASTNode *node) {
+    //_debug_start_(node);
     node->attributes["return_type"] = node->parent->attributes.at("return_type");
 
     if (node->children.empty()) {
@@ -444,12 +463,13 @@ void IntermediateCode::visit_StmtList(ASTNode *node) {
     } else {
         throw runtime_error("error StmtList children");
     }
-
+    //_debug_end_(node);
 }
 
 
 // return_type: Type*
 void IntermediateCode::visit_Stmt(ASTNode *node) {
+    //_debug_start_(node);
     node->attributes["return_type"] = node->parent->attributes.at("return_type");
 
     if (node->children.size() == 2 && node->children[0]->name == "Exp") {
@@ -495,16 +515,17 @@ void IntermediateCode::visit_Stmt(ASTNode *node) {
         string label_true = createLabel();
         string label_false = createLabel();
 
-        string place = createTempSymbol("cond");
-        node->attributes["irplace"] = place;
+        string place;
+        pair<string, string> cond{label_true, label_false};
 
+        node->attributes["irplace"] = place;
+        node->attributes["ircond"] = cond;
         visit_Exp(Exp);
+
         visit_Stmt(Stmt);
 
         vector<shared_ptr<Code>> codes{
                 any_cast<shared_ptr<Code>>(Exp->attributes.at("ircode")),
-                make_shared<Code>(Code("IF " + place + " != #0 GOTO " + label_true)),
-                make_shared<Code>(Code("GOTO " + label_false)),
                 make_shared<Code>(Code("LABEL " + label_true + " :")),
                 any_cast<shared_ptr<Code>>(Stmt->attributes.at("ircode")),
                 make_shared<Code>(Code("LABEL " + label_false + " :"))
@@ -524,9 +545,11 @@ void IntermediateCode::visit_Stmt(ASTNode *node) {
         string label_false = createLabel();
         string label_end = createLabel();
 
-        string place = createTempSymbol("cond");
-        node->attributes["irplace"] = place;
+        string place;
+        pair<string, string> cond{label_true, label_false};
 
+        node->attributes["irplace"] = place;
+        node->attributes["ircond"] = cond;
         visit_Exp(Exp);
 
         visit_Stmt(Stmt1);
@@ -534,8 +557,6 @@ void IntermediateCode::visit_Stmt(ASTNode *node) {
 
         vector<shared_ptr<Code>> codes{
                 any_cast<shared_ptr<Code>>(Exp->attributes.at("ircode")),
-                make_shared<Code>(Code("IF " + place + " != #0 GOTO " + label_true)),
-                make_shared<Code>(Code("GOTO " + label_false)),
                 make_shared<Code>(Code("LABEL " + label_true + " :")),
                 any_cast<shared_ptr<Code>>(Stmt1->attributes.at("ircode")),
                 make_shared<Code>(Code("GOTO " + label_end)),
@@ -554,11 +575,14 @@ void IntermediateCode::visit_Stmt(ASTNode *node) {
         ASTNode *Stmt = node->children[4];
 
         string label_loop = createLabel();
+        string label_body = createLabel();
         string label_end = createLabel();
 
-        string place = createTempSymbol("cond");
-        node->attributes["irplace"] = place;
+        string place;
+        pair<string, string> cond{label_body, label_end};
 
+        node->attributes["irplace"] = place;
+        node->attributes["ircond"] = cond;
         visit_Exp(Exp);
 
         loopTable.emplace_back(LoopItem{"", label_loop, label_end});
@@ -568,7 +592,7 @@ void IntermediateCode::visit_Stmt(ASTNode *node) {
         vector<shared_ptr<Code>> codes{
                 make_shared<Code>(Code("LABEL " + label_loop + " :")),
                 any_cast<shared_ptr<Code>>(Exp->attributes.at("ircode")),
-                make_shared<Code>(Code("IF " + place + " == #0 GOTO " + label_end)),
+                make_shared<Code>(Code("LABEL " + label_body + " :")),
                 any_cast<shared_ptr<Code>>(Stmt->attributes.at("ircode")),
                 make_shared<Code>(Code("GOTO " + label_loop)),
                 make_shared<Code>(Code("LABEL " + label_end + " :"))
@@ -587,11 +611,14 @@ void IntermediateCode::visit_Stmt(ASTNode *node) {
         auto loop_label = any_cast<string>(ID->attributes.at("string_value"));
 
         string label_loop = createLabel();
+        string label_body = createLabel();
         string label_end = createLabel();
 
-        string place = createTempSymbol("cond");
-        node->attributes["irplace"] = place;
+        string place;
+        pair<string, string> cond{label_body, label_end};
 
+        node->attributes["irplace"] = place;
+        node->attributes["ircond"] = cond;
         visit_Exp(Exp);
 
         loopTable.emplace_back(LoopItem{loop_label, label_loop, label_end});
@@ -601,7 +628,7 @@ void IntermediateCode::visit_Stmt(ASTNode *node) {
         vector<shared_ptr<Code>> codes{
                 make_shared<Code>(Code("LABEL " + label_loop + " :")),
                 any_cast<shared_ptr<Code>>(Exp->attributes.at("ircode")),
-                make_shared<Code>(Code("IF " + place + " == #0 GOTO " + label_end)),
+                make_shared<Code>(Code("LABEL " + label_body + " :")),
                 any_cast<shared_ptr<Code>>(Stmt->attributes.at("ircode")),
                 make_shared<Code>(Code("GOTO " + label_loop)),
                 make_shared<Code>(Code("LABEL " + label_end + " :"))
@@ -760,12 +787,13 @@ void IntermediateCode::visit_Stmt(ASTNode *node) {
     } else {
         throw runtime_error("error Stmt children");
     }
-
+    //_debug_end_(node);
 }
 
 
 // definitions: vector<pair<string, shared_ptr<Type>>>
 void IntermediateCode::visit_DefList(ASTNode *node) {
+    //_debug_start_(node);
     if (node->children.empty()) {
         // DefList: %empty
 
@@ -789,11 +817,13 @@ void IntermediateCode::visit_DefList(ASTNode *node) {
     } else {
         throw runtime_error("error DefList children");
     }
+    //_debug_end_(node);
 }
 
 // definitions: vector<pair<string, shared_ptr<Type>>>
 // type: Type*
 void IntermediateCode::visit_Def(ASTNode *node) {
+    //_debug_start_(node);
     // Def: Specifier DecList SEMI
     ASTNode *Specifier = node->children[0];
     ASTNode *DecList = node->children[1];
@@ -803,12 +833,13 @@ void IntermediateCode::visit_Def(ASTNode *node) {
     visit_DecList(DecList);
 
     node->attributes["ircode"] = DecList->attributes.at("ircode");
-
+    //_debug_end_(node);
 }
 
 // definitions: vector<pair<string, shared_ptr<Type>>>
 // type: Type*
 void IntermediateCode::visit_DecList(ASTNode *node) {
+    //_debug_start_(node);
     node->attributes["type"] = node->parent->attributes.at("type");
 
     if (node->children.size() == 1) {
@@ -837,11 +868,13 @@ void IntermediateCode::visit_DecList(ASTNode *node) {
     } else {
         throw runtime_error("error DecList children");
     }
+    //_debug_end_(node);
 }
 
 // declaration: pair<string, shared_ptr<Type>>
 // type: Type*
 void IntermediateCode::visit_Dec(ASTNode *node) {
+    //_debug_start_(node);
     node->attributes["type"] = node->parent->attributes.at("type");
 
     if (node->children.size() == 1) {
@@ -874,11 +907,45 @@ void IntermediateCode::visit_Dec(ASTNode *node) {
     } else {
         throw runtime_error("error Dec children");
     }
+    //_debug_end_(node);
+}
+
+string mapArithmeticOperation(const string &OP) {
+    if (OP == "PLUS") {
+        return "+";
+    } else if (OP == "MINUS") {
+        return "-";
+    } else if (OP == "MUL") {
+        return "*";
+    } else if (OP == "DIV") {
+        return "/";
+    } else {
+        throw runtime_error("unexpected arithmetic operation " + OP);
+    }
+}
+
+string mapRelationOperation(const string &OP) {
+    if (OP == "LT") {
+        return "<";
+    } else if (OP == "LE") {
+        return "<=";
+    } else if (OP == "GT") {
+        return ">";
+    } else if (OP == "GE") {
+        return ">=";
+    } else if (OP == "NE") {
+        return "!=";
+    } else if (OP == "EQ") {
+        return "==";
+    } else {
+        throw runtime_error("unexpected relation operation " + OP);
+    }
 }
 
 // type: optional<shared_ptr<Type>>
 // lvalue: bool
 void IntermediateCode::visit_Exp(ASTNode *node) {
+    //_debug_start_(node);
     auto target = any_cast<string>(node->parent->attributes.at("irplace"));
 
     if (node->children.size() == 1 && node->children[0]->name == "ID") {
@@ -890,13 +957,27 @@ void IntermediateCode::visit_Exp(ASTNode *node) {
 
         node->attributes["irname"] = id;
 
+        vector<shared_ptr<Code>> codes{};
+
+        if (target.empty() && node->parent->attributes.find("ircond") != node->parent->attributes.end()) {
+            target = createTempSymbol();
+        }
+
         if (dynamic_pointer_cast<IntType>(type.value()) != nullptr) {
-            node->attributes["ircode"] = dropEmpty(target, Code(target + " := " + symbolTable.at(id)));
+            codes.push_back(dropEmpty(target, Code(target + " := " + symbolTable.at(id))));
         } else {
             string iraddr = symbolTable.at(id);
-            node->attributes["ircode"] = dropEmpty(target, Code(target + " := *" + iraddr));
+            codes.push_back(dropEmpty(target, Code(target + " := *" + iraddr)));
             node->attributes["iraddr"] = iraddr;
         }
+
+        if (node->parent->attributes.find("ircond") != node->parent->attributes.end()) {
+            auto cond = any_cast<pair<string, string>>(node->parent->attributes.at("ircond"));
+            codes.push_back(make_shared<Code>(Code("IF " + target + " != #0 GOTO " + cond.first)));
+            codes.push_back(make_shared<Code>(Code("GOTO " + cond.second)));
+        }
+
+        node->attributes["ircode"] = make_shared<Code>(Code(codes));
 
     } else if (node->children.size() == 1 && node->children[0]->name == "INT") {
         // Exp: INT
@@ -904,7 +985,21 @@ void IntermediateCode::visit_Exp(ASTNode *node) {
 
         auto value = any_cast<int>(INT->attributes.at("int_value"));
 
-        node->attributes["ircode"] = dropEmpty(target, Code(target + " := #" + std::to_string(value)));
+        vector<shared_ptr<Code>> codes{};
+
+        if (target.empty() && node->parent->attributes.find("ircond") != node->parent->attributes.end()) {
+            target = createTempSymbol();
+        }
+
+        codes.push_back(dropEmpty(target, Code(target + " := #" + std::to_string(value))));
+
+        if (node->parent->attributes.find("ircond") != node->parent->attributes.end()) {
+            auto cond = any_cast<pair<string, string>>(node->parent->attributes.at("ircond"));
+            codes.push_back(make_shared<Code>(Code("IF " + target + " != #0 GOTO " + cond.first)));
+            codes.push_back(make_shared<Code>(Code("GOTO " + cond.second)));
+        }
+
+        node->attributes["ircode"] = make_shared<Code>(Code(codes));
 
     } else if (node->children.size() == 1 && node->children[0]->name == "FLOAT") {
         // Exp: FLOAT
@@ -937,6 +1032,10 @@ void IntermediateCode::visit_Exp(ASTNode *node) {
         node->attributes["irplace"] = place2;
         visit_Exp(Exp2);
 
+        if (target.empty() && node->parent->attributes.find("ircond") != node->parent->attributes.end()) {
+            target = createTempSymbol();
+        }
+
         if (Exp1->attributes.find("irname") != Exp1->attributes.end()) {
             auto id = any_cast<string>(Exp1->attributes.at("irname"));
 
@@ -945,6 +1044,12 @@ void IntermediateCode::visit_Exp(ASTNode *node) {
                     make_shared<Code>(Code(symbolTable.at(id) + " := " + place2)),
                     dropEmpty(target, Code(target + " := " + place2))
             };
+
+            if (node->parent->attributes.find("ircond") != node->parent->attributes.end()) {
+                auto cond = any_cast<pair<string, string>>(node->parent->attributes.at("ircond"));
+                codes.push_back(make_shared<Code>(Code("IF " + target + " != #0 GOTO " + cond.first)));
+                codes.push_back(make_shared<Code>(Code("GOTO " + cond.second)));
+            }
 
             auto code = make_shared<Code>(Code(codes));
 
@@ -960,6 +1065,12 @@ void IntermediateCode::visit_Exp(ASTNode *node) {
                     dropEmpty(target, Code(target + " := " + place2))
             };
 
+            if (node->parent->attributes.find("ircond") != node->parent->attributes.end()) {
+                auto cond = any_cast<pair<string, string>>(node->parent->attributes.at("ircond"));
+                codes.push_back(make_shared<Code>(Code("IF " + target + " != #0 GOTO " + cond.first)));
+                codes.push_back(make_shared<Code>(Code("GOTO " + cond.second)));
+            }
+
             auto code = make_shared<Code>(Code(codes));
 
             node->attributes["ircode"] = code;
@@ -972,57 +1083,92 @@ void IntermediateCode::visit_Exp(ASTNode *node) {
         ASTNode *OP = node->children[1];
         ASTNode *Exp2 = node->children[2];
 
-        string place1 = createTempSymbol();
-        string place2 = target.empty() ? "" : createTempSymbol();
+        if (node->parent->attributes.find("ircond") != node->parent->attributes.end()) {
+            auto cond = any_cast<pair<string, string>>(node->parent->attributes.at("ircond"));
 
-        node->attributes["irplace"] = place1;
-        visit_Exp(Exp1);
+            string place = createTempSymbol();
+            string next = createLabel();
 
-        node->attributes["irplace"] = place2;
-        visit_Exp(Exp2);
+            pair<string, string> cond1;
+            pair<string, string> cond2;
 
-        string quick_judge;
+            if (OP->name == "AND") {
+                cond1 = {next, cond.second};
+                cond2 = {cond.first, cond.second};
+            } else if (OP->name == "OR") {
+                cond1 = {cond.first, next};
+                cond2 = {cond.first, cond.second};
+            }
 
-        string quick_res;
-        string slow_res;
-        if (OP->name == "AND") {
-            quick_judge = " == #0 GOTO ";
-            quick_res = " := #0";
-            slow_res = " := #1";
-        } else if (OP->name == "OR") {
-            quick_judge = " != #0 GOTO ";
-            quick_res = " := #1";
-            slow_res = " := #0";
-        }
+            node->attributes["irplace"] = place;
+            node->attributes["ircond"] = cond1;
+            visit_Exp(Exp1);
+            node->attributes["irplace"] = place;
+            node->attributes["ircond"] = cond2;
+            visit_Exp(Exp2);
 
-        string label_quick = createLabel();
-        string label_end = createLabel();
-
-        vector<shared_ptr<Code>> codes{
-                any_cast<shared_ptr<Code>>(Exp1->attributes.at("ircode")),
-                make_shared<Code>(Code("IF " + place1 + quick_judge + label_quick)),
-                any_cast<shared_ptr<Code>>(Exp2->attributes.at("ircode")),
-                make_shared<Code>(Code("IF " + place2 + quick_judge + label_quick)),
-                make_shared<Code>(Code(target + slow_res)),
-                make_shared<Code>(Code("GOTO " + label_end)),
-                make_shared<Code>(Code("LABEL " + label_quick + " :")),
-                make_shared<Code>(Code(target + quick_res)),
-                make_shared<Code>(Code("LABEL " + label_end + " :"))
-        };
-
-        if (target.empty()) {
-            codes = {
+            vector<shared_ptr<Code>> codes{
                     any_cast<shared_ptr<Code>>(Exp1->attributes.at("ircode")),
-                    make_shared<Code>(Code("IF " + place1 + quick_judge + label_end)),
+                    make_shared<Code>(Code("LABEL " + next + " :")),
+                    any_cast<shared_ptr<Code>>(Exp2->attributes.at("ircode"))
+            };
+
+            auto code = make_shared<Code>(Code(codes));
+
+            node->attributes["ircode"] = code;
+
+        } else {
+            string place1 = createTempSymbol();
+            string place2 = target.empty() ? "" : createTempSymbol();
+
+            node->attributes["irplace"] = place1;
+            visit_Exp(Exp1);
+
+            node->attributes["irplace"] = place2;
+            visit_Exp(Exp2);
+
+            string quick_judge;
+
+            string quick_res;
+            string slow_res;
+            if (OP->name == "AND") {
+                quick_judge = " == #0 GOTO ";
+                quick_res = " := #0";
+                slow_res = " := #1";
+            } else if (OP->name == "OR") {
+                quick_judge = " != #0 GOTO ";
+                quick_res = " := #1";
+                slow_res = " := #0";
+            }
+
+            string label_quick = createLabel();
+            string label_end = createLabel();
+
+            vector<shared_ptr<Code>> codes{
+                    any_cast<shared_ptr<Code>>(Exp1->attributes.at("ircode")),
+                    make_shared<Code>(Code("IF " + place1 + quick_judge + label_quick)),
                     any_cast<shared_ptr<Code>>(Exp2->attributes.at("ircode")),
+                    make_shared<Code>(Code("IF " + place2 + quick_judge + label_quick)),
+                    make_shared<Code>(Code(target + slow_res)),
+                    make_shared<Code>(Code("GOTO " + label_end)),
+                    make_shared<Code>(Code("LABEL " + label_quick + " :")),
+                    make_shared<Code>(Code(target + quick_res)),
                     make_shared<Code>(Code("LABEL " + label_end + " :"))
             };
+
+            if (target.empty()) {
+                codes = {
+                        any_cast<shared_ptr<Code>>(Exp1->attributes.at("ircode")),
+                        make_shared<Code>(Code("IF " + place1 + quick_judge + label_end)),
+                        any_cast<shared_ptr<Code>>(Exp2->attributes.at("ircode")),
+                        make_shared<Code>(Code("LABEL " + label_end + " :"))
+                };
+            }
+
+            auto code = make_shared<Code>(Code(codes));
+
+            node->attributes["ircode"] = code;
         }
-
-        auto code = make_shared<Code>(Code(codes));
-
-        node->attributes["ircode"] = code;
-
 
     } else if (node->children.size() == 3 && node->children[0]->name == "Exp" && node->children[2]->name == "Exp") {
         // Exp: Exp LT Exp
@@ -1038,93 +1184,121 @@ void IntermediateCode::visit_Exp(ASTNode *node) {
         ASTNode *Exp1 = node->children[0];
         ASTNode *OP = node->children[1];
         ASTNode *Exp2 = node->children[2];
+        if (node->parent->attributes.find("ircond") != node->parent->attributes.end()) {
+            auto cond = any_cast<pair<string, string>>(node->parent->attributes.at("ircond"));
 
-        string place1;
-        string place2;
+            string place1 = createTempSymbol();
+            string place2 = createTempSymbol();
 
-        if (!target.empty()) {
-            place1 = createTempSymbol();
-            place2 = createTempSymbol();
-        }
+            if (OP->name == "LT" || OP->name == "LE" || OP->name == "GT" || OP->name == "GE" ||
+                OP->name == "NE" || OP->name == "EQ") {
 
-        node->attributes["irplace"] = place1;
-        visit_Exp(Exp1);
+                node->attributes["irplace"] = place1;
+                visit_Exp(Exp1);
 
-        node->attributes["irplace"] = place2;
-        visit_Exp(Exp2);
+                node->attributes["irplace"] = place2;
+                visit_Exp(Exp2);
 
-        if (OP->name == "LT" || OP->name == "LE" || OP->name == "GT" || OP->name == "GE" ||
-            OP->name == "NE" || OP->name == "EQ") {
-            string label_true = createLabel();
-            string label_end = createLabel();
+                string op = mapRelationOperation(OP->name);
 
-            string op;
-            if (OP->name == "LT") {
-                op = "<";
-            } else if (OP->name == "LE") {
-                op = "<=";
-            } else if (OP->name == "GT") {
-                op = ">";
-            } else if (OP->name == "GE") {
-                op = ">=";
-            } else if (OP->name == "NE") {
-                op = "!=";
-            } else if (OP->name == "EQ") {
-                op = "==";
-            } else {
-                throw runtime_error("unexpected operation " + OP->name);
-            }
-
-            vector<shared_ptr<Code>> codes{
-                    any_cast<shared_ptr<Code>>(Exp1->attributes.at("ircode")),
-                    any_cast<shared_ptr<Code>>(Exp2->attributes.at("ircode")),
-                    make_shared<Code>(Code("IF " + place1 + " " + op + " " + place2 + " GOTO " + label_true)),
-                    make_shared<Code>(Code(target + " := #0")),
-                    make_shared<Code>(Code("GOTO " + label_end)),
-                    make_shared<Code>(Code("LABEL " + label_true + " :")),
-                    make_shared<Code>(Code(target + " := #1")),
-                    make_shared<Code>(Code("LABEL " + label_end + " :"))
-            };
-
-            if (target.empty()) {
-                codes = {
+                vector<shared_ptr<Code>> codes{
                         any_cast<shared_ptr<Code>>(Exp1->attributes.at("ircode")),
-                        any_cast<shared_ptr<Code>>(Exp2->attributes.at("ircode"))
+                        any_cast<shared_ptr<Code>>(Exp2->attributes.at("ircode")),
+                        make_shared<Code>(Code("IF " + place1 + " " + op + " " + place2 + " GOTO " + cond.first)),
+                        make_shared<Code>(Code("GOTO " + cond.second))
                 };
+
+                auto code = make_shared<Code>(Code(codes));
+
+                node->attributes["ircode"] = code;
+
+            } else if (OP->name == "PLUS" || OP->name == "MINUS" || OP->name == "MUL" || OP->name == "DIV") {
+
+                string op = mapArithmeticOperation(OP->name);
+
+                if (target.empty()) {
+                    target = createTempSymbol();
+                }
+
+                vector<shared_ptr<Code>> codes{
+                        any_cast<shared_ptr<Code>>(Exp1->attributes.at("ircode")),
+                        any_cast<shared_ptr<Code>>(Exp2->attributes.at("ircode")),
+                        make_shared<Code>(Code(target + " := " + place1 + " " + op + " " + place2)),
+                        make_shared<Code>(Code("IF " + target + " != #0 GOTO " + cond.first)),
+                        make_shared<Code>(Code("GOTO " + cond.second))
+                };
+
+                auto code = make_shared<Code>(Code(codes));
+
+                node->attributes["ircode"] = code;
             }
 
-            auto code = make_shared<Code>(Code(codes));
+        } else {
+            string place1;
+            string place2;
 
-            node->attributes["ircode"] = code;
-
-        } else if (OP->name == "PLUS" || OP->name == "MINUS" || OP->name == "MUL" || OP->name == "DIV") {
-
-            string op;
-            if (OP->name == "PLUS") {
-                op = "+";
-            } else if (OP->name == "MINUS") {
-                op = "-";
-            } else if (OP->name == "MUL") {
-                op = "*";
-            } else if (OP->name == "DIV") {
-                op = "/";
-            } else {
-                throw runtime_error("unexpected operation " + OP->name);
+            if (!target.empty()) {
+                place1 = createTempSymbol();
+                place2 = createTempSymbol();
             }
 
-            vector<shared_ptr<Code>> codes{
-                    any_cast<shared_ptr<Code>>(Exp1->attributes.at("ircode")),
-                    any_cast<shared_ptr<Code>>(Exp2->attributes.at("ircode")),
-                    dropEmpty(target, Code(target + " := " + place1 + " " + op + " " + place2))
-            };
+            node->attributes["irplace"] = place1;
+            visit_Exp(Exp1);
 
-            auto code = make_shared<Code>(Code(codes));
+            node->attributes["irplace"] = place2;
+            visit_Exp(Exp2);
 
-            node->attributes["ircode"] = code;
+            if (OP->name == "LT" || OP->name == "LE" || OP->name == "GT" || OP->name == "GE" ||
+                OP->name == "NE" || OP->name == "EQ") {
+                string label_true = createLabel();
+                string label_end = createLabel();
+
+                string op = mapRelationOperation(OP->name);
+
+                vector<shared_ptr<Code>> codes{
+                        any_cast<shared_ptr<Code>>(Exp1->attributes.at("ircode")),
+                        any_cast<shared_ptr<Code>>(Exp2->attributes.at("ircode")),
+                        make_shared<Code>(Code("IF " + place1 + " " + op + " " + place2 + " GOTO " + label_true)),
+                        make_shared<Code>(Code(target + " := #0")),
+                        make_shared<Code>(Code("GOTO " + label_end)),
+                        make_shared<Code>(Code("LABEL " + label_true + " :")),
+                        make_shared<Code>(Code(target + " := #1")),
+                        make_shared<Code>(Code("LABEL " + label_end + " :"))
+                };
+
+                if (target.empty()) {
+                    codes = {
+                            any_cast<shared_ptr<Code>>(Exp1->attributes.at("ircode")),
+                            any_cast<shared_ptr<Code>>(Exp2->attributes.at("ircode"))
+                    };
+                }
+
+                auto code = make_shared<Code>(Code(codes));
+
+                node->attributes["ircode"] = code;
+            } else if (OP->name == "PLUS" || OP->name == "MINUS" || OP->name == "MUL" || OP->name == "DIV") {
+
+                string op = mapArithmeticOperation(OP->name);
+
+                vector<shared_ptr<Code>> codes{
+                        any_cast<shared_ptr<Code>>(Exp1->attributes.at("ircode")),
+                        any_cast<shared_ptr<Code>>(Exp2->attributes.at("ircode")),
+                        dropEmpty(target, Code(target + " := " + place1 + " " + op + " " + place2))
+                };
+
+                auto code = make_shared<Code>(Code(codes));
+
+                node->attributes["ircode"] = code;
+            }
         }
     } else if (node->children.size() == 3 && node->children[0]->name == "LP" && node->children[2]->name == "RP") {
         // Exp: LP Exp RP
         ASTNode *Exp = node->children[1];
+
+        if (node->parent->attributes.find("ircond") != node->parent->attributes.end()) {
+            auto cond = any_cast<pair<string, string>>(node->parent->attributes.at("ircond"));
+            node->attributes["ircond"] = cond;
+        }
 
         node->attributes["irplace"] = target;
         visit_Exp(Exp);
@@ -1137,48 +1311,70 @@ void IntermediateCode::visit_Exp(ASTNode *node) {
         ASTNode *OP = node->children[0];
         ASTNode *Exp = node->children[1];
 
-        string place;
-        if (!target.empty()) {
-            place = createTempSymbol();
-        }
+        if (node->parent->attributes.find("ircond") != node->parent->attributes.end()) {
+            auto cond = any_cast<pair<string, string>>(node->parent->attributes.at("ircond"));
+            string place;
 
-        node->attributes["irplace"] = place;
-        visit_Exp(Exp);
+            if (OP->name == "MINUS") {
+                node->attributes["ircond"] = cond;
+                node->attributes["irplace"] = place;
+            } else if (OP->name == "NOT") {
+                pair<string, string> not_cond{cond.second, cond.first};
 
-        if (OP->name == "MINUS") {
-            vector<shared_ptr<Code>> codes{
-                    any_cast<shared_ptr<Code>>(Exp->attributes.at("ircode")),
-                    dropEmpty(target, Code(target + " := #0 - " + place)),
-            };
-
-            auto code = make_shared<Code>(Code(codes));
-
-            node->attributes["ircode"] = code;
-
-        } else if (OP->name == "NOT") {
-
-            string label_false = createLabel();
-            string label_end = createLabel();
-
-            vector<shared_ptr<Code>> codes{
-                    any_cast<shared_ptr<Code>>(Exp->attributes.at("ircode")),
-                    make_shared<Code>(Code("IF " + place + " != #0 GOTO " + label_false)),
-                    make_shared<Code>(Code(target + " := #1")),
-                    make_shared<Code>(Code("GOTO " + label_end)),
-                    make_shared<Code>(Code("LABEL " + label_false + " :")),
-                    make_shared<Code>(Code(target + " := #0")),
-                    make_shared<Code>(Code("LABEL " + label_end + " :")),
-            };
-
-            if (target.empty()) {
-                codes = {
-                        any_cast<shared_ptr<Code>>(Exp->attributes.at("ircode"))
-                };
+                node->attributes["ircond"] = not_cond;
+                node->attributes["irplace"] = place;
             }
 
-            auto code = make_shared<Code>(Code(codes));
+            visit_Exp(Exp);
+
+            auto code = any_cast<shared_ptr<Code>>(Exp->attributes.at("ircode"));
 
             node->attributes["ircode"] = code;
+
+        } else {
+            string place;
+            if (!target.empty()) {
+                place = createTempSymbol();
+            }
+
+            node->attributes["irplace"] = place;
+            visit_Exp(Exp);
+
+            if (OP->name == "MINUS") {
+                vector<shared_ptr<Code>> codes{
+                        any_cast<shared_ptr<Code>>(Exp->attributes.at("ircode")),
+                        dropEmpty(target, Code(target + " := #0 - " + place)),
+                };
+
+                auto code = make_shared<Code>(Code(codes));
+
+                node->attributes["ircode"] = code;
+
+            } else if (OP->name == "NOT") {
+
+                string label_false = createLabel();
+                string label_end = createLabel();
+
+                vector<shared_ptr<Code>> codes{
+                        any_cast<shared_ptr<Code>>(Exp->attributes.at("ircode")),
+                        make_shared<Code>(Code("IF " + place + " != #0 GOTO " + label_false)),
+                        make_shared<Code>(Code(target + " := #1")),
+                        make_shared<Code>(Code("GOTO " + label_end)),
+                        make_shared<Code>(Code("LABEL " + label_false + " :")),
+                        make_shared<Code>(Code(target + " := #0")),
+                        make_shared<Code>(Code("LABEL " + label_end + " :")),
+                };
+
+                if (target.empty()) {
+                    codes = {
+                            any_cast<shared_ptr<Code>>(Exp->attributes.at("ircode"))
+                    };
+                }
+
+                auto code = make_shared<Code>(Code(codes));
+
+                node->attributes["ircode"] = code;
+            }
         }
     } else if (node->children.size() == 3 && node->children[1]->name == "LP" && node->children[2]->name == "RP") {
         // Exp: ID LP RP
@@ -1190,15 +1386,23 @@ void IntermediateCode::visit_Exp(ASTNode *node) {
 
         auto id = any_cast<string>(ID->attributes.at("string_value"));
 
+        vector<shared_ptr<Code>> codes{};
+
         if (id == "read") {
-            auto code = make_shared<Code>(Code("READ " + target));
-
-            node->attributes["ircode"] = code;
+            codes.push_back(make_shared<Code>(Code("READ " + target)));
         } else {
-            auto code = make_shared<Code>(Code(target + " := CALL " + id));
-
-            node->attributes["ircode"] = code;
+            codes.push_back(make_shared<Code>(Code(target + " := CALL " + id)));
         }
+
+        if (node->parent->attributes.find("ircond") != node->parent->attributes.end()) {
+            auto cond = any_cast<pair<string, string>>(node->parent->attributes.at("ircond"));
+            codes.push_back(make_shared<Code>(Code("IF " + target + " != #0 GOTO " + cond.first)));
+            codes.push_back(make_shared<Code>(Code("GOTO " + cond.second)));
+        }
+
+        shared_ptr<Code> code = make_shared<Code>(Code(codes));
+
+        node->attributes["ircode"] = code;
 
     } else if (node->children.size() == 4 && node->children[1]->name == "LP" && node->children[3]->name == "RP") {
         // Exp: ID LP Args RP
@@ -1215,19 +1419,17 @@ void IntermediateCode::visit_Exp(ASTNode *node) {
 
         auto args = any_cast<vector<string>>(Args->attributes.at("irargs"));
 
+        vector<shared_ptr<Code>> codes{};
+
         if (id == "write") {
-            vector<shared_ptr<Code>> codes{
+            codes = {
                     any_cast<shared_ptr<Code>>(Args->attributes.at("ircode")),
                     make_shared<Code>(Code("WRITE " + args[0]))
             };
-
-            auto code = make_shared<Code>(codes);
-
-            node->attributes["ircode"] = code;
+            if (node->parent->attributes.find("ircond") != node->parent->attributes.end()) {
+                make_shared<Code>(Code(target + " := #0"));
+            }
         } else {
-
-            vector<shared_ptr<Code>> codes{};
-
             codes.push_back(any_cast<shared_ptr<Code>>(Args->attributes.at("ircode")));
 
             for (auto it = args.rbegin(); it != args.rend(); it++) {
@@ -1235,11 +1437,17 @@ void IntermediateCode::visit_Exp(ASTNode *node) {
             }
 
             codes.push_back(make_shared<Code>(Code(target + " := CALL " + id)));
-
-            auto code = make_shared<Code>(Code(codes));
-
-            node->attributes["ircode"] = code;
         }
+
+        if (node->parent->attributes.find("ircond") != node->parent->attributes.end()) {
+            auto cond = any_cast<pair<string, string>>(node->parent->attributes.at("ircond"));
+            codes.push_back(make_shared<Code>(Code("IF " + target + " != #0 GOTO " + cond.first)));
+            codes.push_back(make_shared<Code>(Code("GOTO " + cond.second)));
+        }
+
+        auto code = make_shared<Code>(codes);
+
+        node->attributes["ircode"] = code;
 
     } else if (node->children.size() == 4 && node->children[1]->name == "LB" && node->children[3]->name == "RB") {
         // Exp: Exp LB Exp RB
@@ -1263,6 +1471,10 @@ void IntermediateCode::visit_Exp(ASTNode *node) {
         string offset = createTempSymbol("offset");
         string iraddr = createTempSymbol("addr");
 
+        if (target.empty() && node->parent->attributes.find("ircond") != node->parent->attributes.end()) {
+            target = createTempSymbol();
+        }
+
         vector<shared_ptr<Code>> codes{
                 any_cast<shared_ptr<Code>>(Exp1->attributes.at("ircode")),
                 any_cast<shared_ptr<Code>>(Exp2->attributes.at("ircode")),
@@ -1270,6 +1482,12 @@ void IntermediateCode::visit_Exp(ASTNode *node) {
                 make_shared<Code>(Code(iraddr + " := " + start_addr + " + " + offset)),
                 dropEmpty(target, Code(target + " := *" + iraddr))
         };
+
+        if (node->parent->attributes.find("ircond") != node->parent->attributes.end()) {
+            auto cond = any_cast<pair<string, string>>(node->parent->attributes.at("ircond"));
+            codes.push_back(make_shared<Code>(Code("IF " + target + " != #0 GOTO " + cond.first)));
+            codes.push_back(make_shared<Code>(Code("GOTO " + cond.second)));
+        }
 
         node->attributes["ircode"] = make_shared<Code>(Code(codes));
         node->attributes["iraddr"] = iraddr;
@@ -1301,11 +1519,21 @@ void IntermediateCode::visit_Exp(ASTNode *node) {
             offset += it.second->width;
         }
 
+        if (target.empty() && node->parent->attributes.find("ircond") != node->parent->attributes.end()) {
+            target = createTempSymbol();
+        }
+
         vector<shared_ptr<Code>> codes{
                 any_cast<shared_ptr<Code>>(Exp->attributes.at("ircode")),
                 make_shared<Code>(Code(iraddr + " := " + start_addr + " + #" + std::to_string(offset))),
                 dropEmpty(target, Code(target + " := *" + iraddr))
         };
+
+        if (node->parent->attributes.find("ircond") != node->parent->attributes.end()) {
+            auto cond = any_cast<pair<string, string>>(node->parent->attributes.at("ircond"));
+            codes.push_back(make_shared<Code>(Code("IF " + target + " != #0 GOTO " + cond.first)));
+            codes.push_back(make_shared<Code>(Code("GOTO " + cond.second)));
+        }
 
         node->attributes["ircode"] = make_shared<Code>(Code(codes));
         node->attributes["iraddr"] = iraddr;
@@ -1313,11 +1541,12 @@ void IntermediateCode::visit_Exp(ASTNode *node) {
     } else {
         throw runtime_error("error Exp children");
     }
-
+    //_debug_end_(node);
 }
 
 // args_type: vector<optional<shared_ptr<Type>>>
 void IntermediateCode::visit_Args(ASTNode *node) {
+    //_debug_start_(node);
     if (node->children.size() == 1) {
         // Args: Exp
         ASTNode *Exp = node->children[0];
@@ -1377,6 +1606,7 @@ void IntermediateCode::visit_Args(ASTNode *node) {
         node->attributes["ircode"] = code;
 
     }
+    //_debug_end_(node);
 }
 
 

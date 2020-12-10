@@ -4,8 +4,10 @@ i := #1
 READ t1
 m := t1
 LABEL label0 :
-t2cond := #1
-IF t2cond == #0 GOTO label1
+t2 := #1
+IF t2 != #0 GOTO label1
+GOTO label2
+LABEL label1 :
 t5 := res
 t6 := i
 t4 := t5 + t6
@@ -14,30 +16,24 @@ t9 := i
 t10 := #1
 t8 := t9 + t10
 i := t8
-t12 := i
-t13 := m
-IF t12 > t13 GOTO label4
-t11cond := #0
-GOTO label5
-LABEL label4 :
-t11cond := #1
-LABEL label5 :
-IF t11cond != #0 GOTO label2
-GOTO label3
-LABEL label2 :
-GOTO label1
+t11 := i
+t12 := m
+IF t11 > t12 GOTO label3
+GOTO label4
 LABEL label3 :
+GOTO label2
+LABEL label4 :
 GOTO label0
-LABEL label1 :
-t15arg := res
-WRITE t15arg
-t20 := m
-t22 := m
-t23 := #1
-t21 := t22 + t23
-t18 := t20 * t21
-t19 := #2
-t17arg := t18 / t19
-WRITE t17arg
-t24 := #0
-RETURN t24
+LABEL label2 :
+t14arg := res
+WRITE t14arg
+t19 := m
+t21 := m
+t22 := #1
+t20 := t21 + t22
+t17 := t19 * t20
+t18 := #2
+t16arg := t17 / t18
+WRITE t16arg
+t23 := #0
+RETURN t23

@@ -1,40 +1,28 @@
 FUNCTION main :
 READ t1
 n := t1
-t3 := n
-t4 := #0
-IF t3 > t4 GOTO label3
-t2cond := #0
-GOTO label4
-LABEL label3 :
-t2cond := #1
-LABEL label4 :
-IF t2cond != #0 GOTO label0
+t2 := n
+t3 := #0
+IF t2 > t3 GOTO label0
 GOTO label1
 LABEL label0 :
-t6arg := #1
-WRITE t6arg
+t5arg := #1
+WRITE t5arg
 GOTO label2
 LABEL label1 :
-t8 := n
-t9 := #0
-IF t8 < t9 GOTO label8
-t7cond := #0
-GOTO label9
-LABEL label8 :
-t7cond := #1
-LABEL label9 :
-IF t7cond != #0 GOTO label5
-GOTO label6
+t6 := n
+t7 := #0
+IF t6 < t7 GOTO label3
+GOTO label4
+LABEL label3 :
+t10 := #1
+t9arg := #0 - t10
+WRITE t9arg
+GOTO label5
+LABEL label4 :
+t12arg := #0
+WRITE t12arg
 LABEL label5 :
-t12 := #1
-t11arg := #0 - t12
-WRITE t11arg
-GOTO label7
-LABEL label6 :
-t14arg := #0
-WRITE t14arg
-LABEL label7 :
 LABEL label2 :
-t15 := #0
-RETURN t15
+t13 := #0
+RETURN t13
