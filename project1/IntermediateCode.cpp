@@ -126,11 +126,11 @@ void _debug_start_(ASTNode *node) {
         }
     }
     if (_debug_) {
-        printf("%s: ", node->name.data());
+        printf("+%s: ", node->name.data());
     }
     for (auto &_it_:node->children) {
         if (_debug_) {
-            printf("%s: ", _it_->name.data());
+            printf("%s ", _it_->name.data());
         }
     }
     if (_debug_) {
@@ -149,11 +149,11 @@ void _debug_end_(ASTNode *node) {
         }
     }
     if (_debug_) {
-        printf("%s: ", node->name.data());
+        printf("-%s: ", node->name.data());
     }
     for (auto &_it_:node->children) {
         if (_debug_) {
-            printf("%s: ", _it_->name.data());
+            printf("%s ", _it_->name.data());
         }
     }
     if (_debug_) {
@@ -707,7 +707,7 @@ void IntermediateCode::visit_Stmt(ASTNode *node) {
         string label_start = createLabel();
 
         loopTable.emplace_back(LoopItem{"", label_loop, label_end});
-        visit_Stmt(CompSt);
+        visit_CompSt(CompSt);
         loopTable.pop_back();
 
         vector<shared_ptr<Code>> codes{
@@ -715,7 +715,7 @@ void IntermediateCode::visit_Stmt(ASTNode *node) {
                 any_cast<shared_ptr<Code>>(Exp2->attributes.at("ircode")),
                 make_shared<Code>(Code(place_it + " := " + place1)),
                 make_shared<Code>(Code("LABEL " + label_start + " :")),
-                make_shared<Code>(Code("IF " + place_it + " > " + place2 + " #0 GOTO " + label_end)),
+                make_shared<Code>(Code("IF " + place_it + " > " + place2 + " GOTO " + label_end)),
                 any_cast<shared_ptr<Code>>(CompSt->attributes.at("ircode")),
                 make_shared<Code>(Code("LABEL " + label_loop + " :")),
                 make_shared<Code>(Code(place_it + " := " + place_it + " + #1")),
@@ -761,7 +761,7 @@ void IntermediateCode::visit_Stmt(ASTNode *node) {
                 any_cast<shared_ptr<Code>>(Exp2->attributes.at("ircode")),
                 make_shared<Code>(Code(place_it + " := " + place1)),
                 make_shared<Code>(Code("LABEL " + label_start + " :")),
-                make_shared<Code>(Code("IF " + place_it + " > " + place2 + " #0 GOTO " + label_end)),
+                make_shared<Code>(Code("IF " + place_it + " > " + place2 + " GOTO " + label_end)),
                 any_cast<shared_ptr<Code>>(CompSt->attributes.at("ircode")),
                 make_shared<Code>(Code("LABEL " + label_loop + " :")),
                 make_shared<Code>(Code(place_it + " := " + place_it + " + #1")),

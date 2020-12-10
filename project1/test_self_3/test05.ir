@@ -27,13 +27,22 @@ GOTO label0
 LABEL label2 :
 t14arg := res
 WRITE t14arg
-t19 := m
-t21 := m
-t22 := #1
+t16 := #0
+res := t16
+t17start := #1
+t18end := m
+j := t17start
+LABEL label7 :
+IF j > t18end GOTO label6
+t21 := res
+t22 := j
 t20 := t21 + t22
-t17 := t19 * t20
-t18 := #2
-t16arg := t17 / t18
-WRITE t16arg
-t23 := #0
-RETURN t23
+res := t20
+LABEL label5 :
+j := j + #1
+GOTO label7
+LABEL label6 :
+t24arg := res
+WRITE t24arg
+t25 := #0
+RETURN t25
